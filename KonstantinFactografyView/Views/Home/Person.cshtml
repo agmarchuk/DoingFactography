@@ -1,0 +1,53 @@
+﻿
+@using RDFEngine
+@model RDFEngine.RRecord
+@{
+    ViewData["Title"] = "Person";
+}
+
+<h1>Person</h1>
+<div>Id = @Model.Id</div>
+<div>Tp = @Model.Tp</div>
+@if (Model.Tp == "photo")
+{
+    string value= Model.Id; 
+    value = value.Remove(0, 1);
+    int a = Convert.ToInt32(value);
+    int b = 44;
+    string str;
+    int result = a % b;
+    if (result < 10)
+    {
+        str = "000" + result + ".jpg";
+    }
+    else
+    {
+        str = "00" + result + ".jpg";
+    }
+        <img src="~/img/@str" />
+    }
+
+@foreach (var pr in Model.Props)
+{
+    string prop = pr.Prop;
+    if (pr is RField)
+    {
+        string value = ((RField)pr).Value;
+        <div>@prop @value</div>
+    }
+    else if (pr is RLink)
+
+    {
+        string value = ((RLink)pr).Resource;
+        <div>@prop <a href="/Home/Person/@value">Ссылка</a></div>
+    }
+    else if (pr is RInverse)
+    {
+        string value = ((RInverse)pr).Source;
+        <div>@prop <a href="/Home/Person/@value">Обратная ссылка</a></div>
+    }
+
+}
+
+
+
