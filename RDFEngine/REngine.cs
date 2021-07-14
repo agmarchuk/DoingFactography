@@ -61,7 +61,7 @@ namespace RDFEngine
                 .Select(pair => pair.Value)
                 .Where(rr => 
                 {
-                    rr.Props.FirstOrDefault(p => p is RField && ((RField)p).Prop == "http://fogid.net/o/name"
+                    rr.Props.FirstOrDefault(p => p is RField && ((RField)p).Prop == "http://fogid.net/o/name");
                     return true;
                 });
         }

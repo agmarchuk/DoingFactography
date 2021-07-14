@@ -1,0 +1,41 @@
+﻿
+@using RDFEngine
+@model RDFEngine.RRecord
+@{
+    ViewData["Title"] = "Person";
+}
+
+<h1>Person</h1>
+<div>Id = @Model.Id</div>
+<div>Tp = @Model.Tp</div>
+
+@foreach (var pr in Model.Props)
+{
+    string prop = pr.Prop;
+    if (pr is RField)
+    {
+        if (prop == "name")
+        {
+            string value = ((RField)pr).Value;
+            <div>@prop @value</div>
+        }
+        else if (prop == "url")
+        {
+            string value = ((RField)pr).Value;
+            <img src="@value" />
+        }
+
+    }
+    else if (pr is RLink)
+
+    {
+        string value = ((RLink)pr).Resource;
+        <div>@prop <a href="/Home/Person/@value">Ссылка</a></div>
+    }
+    else if (pr is RInverse)
+    {
+        string value = ((RInverse)pr).Source;
+        <div>@prop <a href="/Home/Person/@value">Обратная ссылка</a></div>
+    }
+
+}
