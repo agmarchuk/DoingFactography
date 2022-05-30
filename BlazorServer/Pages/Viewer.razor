@@ -47,13 +47,13 @@
         <br />
 
         var possibleInvs = ont.Where(rec => rec.Tp == "ObjectProperty" &&
-            rec.Props.Any(prop => prop is RLink && prop.Prop == "range" && parentTypes.Contains(((RLink)prop).Resource)))
-            .Where(inv => inv.Props.FirstOrDefault(prop => prop.Prop == "range") != null)
-            .OrderBy(inv =>
-            {
-                var val = ((RField)inv.Props.FirstOrDefault(prop => prop.Prop == "priority"))?.Value;
-                return val == null ? "zzz" : val;
-            });
+                rec.Props.Any(prop => prop is RLink && prop.Prop == "range" && parentTypes.Contains(((RLink)prop).Resource)))
+                .Where(inv => inv.Props.FirstOrDefault(prop => prop.Prop == "range") != null)
+                .OrderBy(inv =>
+                {
+                    var val = ((RField)inv.Props.FirstOrDefault(prop => prop.Prop == "priority"))?.Value;
+                    return val == null ? "zzz" : val;
+                });
         //.OrderBy(inv => inv.);
 
         foreach (var inv in possibleInvs)
@@ -71,10 +71,11 @@
                 if (pTypes.Any())
                 {
                     <table border="1">
-                        <tr>
+                        <tr class="table-header">
                             <th colspan="@domFields.Length">
                                 <span>@Infobase.GetTerm(inv.Id)</span>
                                 <span>@Infobase.GetTerm(((RLink)domain).Resource)</span>
+                                <span><input type="checkbox" id="tiles" @onchange="@(f => toggleTilesView(((RLink)domain).Resource))" /> <span>плиткой</span></span>
                             </th>
                         </tr>
 
@@ -88,25 +89,27 @@
                                     {
                                         if (list.list.Length > 0)
                                         {
+                                            var tilesDisplay = tilesView.Contains(((RLink)domain).Resource);
                                             List<string> nonEmptyFields = new List<string>();
-                                            <tr>
-                                                @foreach (RLink field in domFields)
-                                                {
-                                                    var nonEmpty = list.list.SelectMany(rec => rec.Props.Where(prop => prop.Prop == field.Resource)
-                                                    .Where(p => (p is RField && ((RField)p).Value != null) ||
-                                                   (p is RDirect && ((RDirect)p).DRec != null)));
-                                                    if (nonEmpty.Count() != 0)
+                                                <tr class="@(tilesDisplay ? "table-name-row d-none" : "table-name-row")">
+                                                    @foreach (RLink field in domFields)
                                                     {
-                                                        nonEmptyFields.Add(field.Resource);
-                                                        <th class="secondary">@Infobase.GetTerm(field.Resource)</th>
+                                                        var nonEmpty = list.list.SelectMany(rec => rec.Props.Where(prop => prop.Prop == field.Resource)
+                                                        .Where(p => (p is RField && ((RField)p).Value != null) ||
+                                                       (p is RDirect && ((RDirect)p).DRec != null)));
+                                                        if (nonEmpty.Count() != 0)
+                                                        {
+                                                            nonEmptyFields.Add(field.Resource);
+                                                            <th class="secondary">@Infobase.GetTerm(field.Resource)</th>
+                                                        }
                                                     }
-                                                }
-                                            </tr>
+                                                </tr>
+                                            
                                             @foreach (RRecord r in list.list.OrderBy(rec => rec.Id))
                                             {
 
-                                                <tr>
-                                                    <PropertyViewer onBuildPortrait="@(arg => BuildPortrait((string)arg))" properties="@r.Props" forbidden="@inv.Id" nonEmptyFields="@nonEmptyFields"></PropertyViewer>
+                                                <tr class="@(tilesDisplay ? "table-data-row d-inline-block" : "table-data-row")">
+                                                    <PropertyViewer onBuildPortrait="@(arg => BuildPortrait((string)arg))" properties="@r.Props" forbidden="@inv.Id" nonEmptyFields="@nonEmptyFields" tilesView="@tilesDisplay"></PropertyViewer>
                                                 </tr>
 
 
@@ -135,6 +138,8 @@
     private RRecord originalRecord;
     private string[] parentTypes;
 
+    private List<string> tilesView = new List<string>();
+
     private RRecord[] ont = Infobase.ront.rontology;
     private void BuildPortrait(string id)
     {
@@ -142,6 +147,18 @@
         originalRecord = rec;
         parentTypes = ROntology.parentsDictionary[rec.Tp];
         model = (new Models.P3Model()).Build(rec);
+    }
+
+    protected void toggleTilesView(string domain)
+    {
+        if (tilesView.Contains(domain))
+        {
+            tilesView.Remove(domain);
+        }
+        else
+        {
+            tilesView.Add(domain);
+        }
     }
 
     protected override void OnInitialized() // = On Page Load
@@ -154,6 +171,7 @@
         {
             model = null;
         }
+        tilesView = new List<string>();
     }
 
     protected override void OnParametersSet() // = On Page Load
@@ -166,6 +184,7 @@
         {
             model = null;
         }
+        tilesView = new List<string>();
     }
 }
 

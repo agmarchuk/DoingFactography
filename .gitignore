@@ -362,3 +362,4 @@ MigrationBackup/
 /BlazorServer/wwwroot/credentials.db-wal
 /BlazorServer/wwwroot/config.xml
 /ConsoleTransformer/correction.fog
+/BlazorServer/id_rsa

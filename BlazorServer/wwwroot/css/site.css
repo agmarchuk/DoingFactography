@@ -80,3 +80,7 @@ th.secondary {
 .page-container {
     margin-top: 20px;
 }
+
+tr.table-data-row {
+    padding: 15px;
+}

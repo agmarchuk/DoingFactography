@@ -123,7 +123,7 @@
                 @if (pTypes.Any())
                 {
                     <table border="1">
-                        <tr>
+                        <tr class="table-header">
                             <th colspan="@domFields.Length">
                                 <span>@Infobase.GetTerm(inv.Id)</span>
                                 <span>@Infobase.GetTerm(((RLink)domain).Resource)</span>
@@ -132,7 +132,7 @@
                         </tr>
                         @if (inv.Id == forbidden && ((RLink)domain).Resource == addRecordType)
                         {//add new record to exsisting prop
-                            <tr>
+                            <tr class="table-add-row">
                                 <td colspan="@(domFields.Length + 1)">
                                     <PropertyEditor r="@inv" type="@(((RLink)domain).Resource)" forbidden="@forbidden"
                                                     onSave="@((arg) => { Save((RRecord)arg, true); /* t.list = t.list.Append((RRecord)arg).ToArray();*/ })"
@@ -152,7 +152,7 @@
                                     {
                                         if (list.list.Length > 0)
                                         {
-                                            <tr>
+                                            <tr class="table-name-row">
                                                 @foreach (RLink field in domFields) //header properties of table
                                                 {
                                                     <th class="secondary">@Infobase.GetTerm(field.Resource)</th>
@@ -163,7 +163,7 @@
                                         {
                                             if (r.Id == eid && eid != null)
                                             {//properties editor
-                                                <tr>
+                                                <tr class="table-data-row">
                                                     <td colspan="@(r.Props.Length + 2)">
                                                         <PropertyEditor r="@r" forbidden="@forbidden"
                                                                         onSave="@((arg) => Save((RRecord)arg))"
