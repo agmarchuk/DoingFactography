@@ -784,12 +784,7 @@
   </ObjectProperty>
   <!--                   конец вставка онтологии ontology_iis-v7-doc                   -->
 
-  <!--                   Вставка многостранчиного документа и многостраничной иерархии  2012-06-13                   -->
-  <Class rdf:about="http://fogid.net/o/MultiPartDocument">
-    <label xml:lang="ru">Многостраничный документ</label>
-    <label xml:lang="en">Multi part document</label>
-    <SubClassOf rdf:resource="http://fogid.net/o/document"/>
-  </Class>
+  <!--                   Вставка многостранчиного документа и многостраничной иерархии  2012-06-13, 2022-06-07                   -->
   <Class rdf:about="http://fogid.net/o/DocumentPart">
     <label xml:lang="ru">Раздел документа</label>
     <label xml:lang="en">Part of document</label>
@@ -801,7 +796,7 @@
     <inverse-label xml:lang="ru">раздел</inverse-label>
     <inverse-label xml:lang="en">part</inverse-label>
     <domain rdf:resource="http://fogid.net/o/DocumentPart"/>
-    <range rdf:resource="http://fogid.net/o/MultiPartDocument"/>
+    <range rdf:resource="http://fogid.net/o/document"/>
   </ObjectProperty>
   <ObjectProperty rdf:about="http://fogid.net/o/partItem" priority="m" essential="yes">
     <label xml:lang="ru">часть документа</label>
