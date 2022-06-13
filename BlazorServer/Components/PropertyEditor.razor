@@ -61,7 +61,7 @@ else
         {
             var editClass = (c.Prop == "ObjectProperty" && ((RLink)c).Resource == editProp) ? "edited" : "";
             <tr class="@editClass">
-                <td>@Infobase.GetTerm(((RLink)c).Resource)</td>
+                <td>@Infobase.GetTerm(((RLink)c).Resource, currentLanguage)</td>
                 <td>
                     @{
                         RProperty bindProperty;
@@ -98,7 +98,7 @@ else
                     {
                         if (Infobase.ront.IsEnumeration(bindProperty.Prop))
                         {
-                            var enuminfo = Infobase.ront.EnumPairs(bindProperty.Prop, "ru");
+                            var enuminfo = Infobase.ront.EnumPairs(bindProperty.Prop, currentLanguage);
                             <select @onchange="@(e => SelectChangeHandler(e.Value, bindProperty))">
                                 @foreach(var item in enuminfo)
                                 {
@@ -221,6 +221,8 @@ else
     private string editProp = null;
 
     private RRecord recToAdd = new RRecord();
+
+    private string currentLanguage = MainLayout.currentLanguage;
 
     protected async Task Save()
     {

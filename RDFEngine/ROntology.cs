@@ -150,10 +150,25 @@ namespace RDFEngine
                 List<RProperty> propsList = new List<RProperty>();
                 // el.Elements("label").Select(l => new RField() { Prop = "Label", Value = l.Value })
                 var lls = el.Elements("label").ToArray();
-                string label = el.Elements("label").FirstOrDefault(e => e.Attribute("{http://www.w3.org/XML/1998/namespace}lang").Value == "ru")?.Value;
-                if (label != null) propsList.Add(new RField() { Prop = "Label", Value = label });
-                string invlabel = el.Elements("inverse-label").FirstOrDefault(e => e.Attribute("{http://www.w3.org/XML/1998/namespace}lang").Value == "ru")?.Value;
-                if (invlabel != null) propsList.Add(new RField() { Prop = "InvLabel", Value = label });
+                foreach (var label in el.Elements("label"))
+                {
+                    if (label?.Value != null) propsList.Add(
+                        new RField() {
+                            Prop = "Label", 
+                            Value = label.Value, 
+                            Lang = label.Attribute("{http://www.w3.org/XML/1998/namespace}lang")?.Value
+                        });
+                }
+                foreach (var invlabel in el.Elements("inverse-label"))
+                {
+                    if (invlabel?.Value != null) propsList.Add(
+                        new RField()
+                        {
+                            Prop = "InvLabel",
+                            Value = invlabel.Value,
+                            Lang = invlabel.Attribute("{http://www.w3.org/XML/1998/namespace}lang")?.Value
+                        });
+                }
                 propsList.Add(new RField() { Prop = "priority", Value = el.Attribute("priority")?.Value });
 
                 var sortedProps = xontology.Elements()

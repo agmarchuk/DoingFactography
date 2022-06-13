@@ -84,3 +84,9 @@ th.secondary {
 tr.table-data-row {
     padding: 15px;
 }
+
+.lang-selector {
+    position: absolute;
+    top: 30px;
+    left: 90%;
+}

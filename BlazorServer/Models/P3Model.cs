@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BlazorServer.Shared;
 using RDFEngine;
 
 namespace BlazorServer.Models
@@ -67,7 +68,7 @@ namespace BlazorServer.Models
                     kd.GroupBy(d => d.IRec.Tp)
                         .Select(dd => {
                             var qu = dd.Select(x => x.IRec)
-                                .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = Infobase.ront.ReorderFieldsDirects(rr, "ru") })
+                                .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = Infobase.ront.ReorderFieldsDirects(rr, MainLayout.currentLanguage) })
                                 .ToArray();
                             return new InverseType
                             {
@@ -81,7 +82,7 @@ namespace BlazorServer.Models
                 Id = erec.Id,
                 Tp = erec.Tp,
                 //row = erec.Props.Where(p => p is RField || p is RDirect).ToArray(),
-                row = Infobase.ront.ReorderFieldsDirects(erec, "ru"),
+                row = Infobase.ront.ReorderFieldsDirects(erec, MainLayout.currentLanguage),
                 inv = query.ToArray()
             };
         }

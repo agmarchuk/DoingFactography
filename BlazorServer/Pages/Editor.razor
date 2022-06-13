@@ -18,12 +18,12 @@
 
         <table border="1">
             <tr>
-                <th colspan="@(m.row.Length+1)">@Infobase.GetTerm(m.Tp) @m.Id <NavLink href="@("/viewer/" + originalRecord.Id)">Просмотр</NavLink></th>
+                <th colspan="@(m.row.Length+1)">@Infobase.GetTerm(m.Tp, currentLanguage) @m.Id <NavLink href="@("/viewer/" + originalRecord.Id)">Просмотр</NavLink></th>
             </tr>
             <tr>
                 @foreach (var c in ont.FirstOrDefault(r => r.Id == m.Tp).Props.Where(p => p is RLink))
                 {
-                    <th class="secondary">@Infobase.GetTerm(((RLink)c).Resource)</th>
+                    <th class="secondary">@Infobase.GetTerm(((RLink)c).Resource, currentLanguage)</th>
                 }
 
                 <td></td>
@@ -68,7 +68,7 @@
                                                     })">
                 @foreach (RRecord inv in possibleInvs)
                 {
-                    <option value="@inv.Id">@Infobase.GetTerm(inv.Id)</option>
+                    <option value="@inv.Id">@Infobase.GetTerm(inv.Id, currentLanguage)</option>
                 }
             </select>
             @if (selectedInvId != null)
@@ -86,7 +86,7 @@
                         var decendants = Infobase.ront.DescendantsAndSelf(((RLink)domain).Resource);
                         foreach (var dec in decendants)
                         {
-                            <option value="@(dec)">@Infobase.GetTerm(dec)</option>
+                            <option value="@(dec)">@Infobase.GetTerm(dec, currentLanguage)</option>
                         }
                     }
                 </select>
@@ -125,8 +125,8 @@
                     <table border="1">
                         <tr class="table-header">
                             <th colspan="@domFields.Length">
-                                <span>@Infobase.GetTerm(inv.Id)</span>
-                                <span>@Infobase.GetTerm(((RLink)domain).Resource)</span>
+                                <span>@Infobase.GetTerm(inv.Id, currentLanguage)</span>
+                                <span>@Infobase.GetTerm(((RLink)domain).Resource, currentLanguage)</span>
                             </th>
                             <td colspan="2"><a href="javascript:void(0)" @onclick="e => Add(inv.Id, ((RLink)domain).Resource)">доб</a></td>
                         </tr>
@@ -155,7 +155,7 @@
                                             <tr class="table-name-row">
                                                 @foreach (RLink field in domFields) //header properties of table
                                                 {
-                                                    <th class="secondary">@Infobase.GetTerm(field.Resource)</th>
+                                                    <th class="secondary">@Infobase.GetTerm(field.Resource, currentLanguage)</th>
                                                 }
                                             </tr>
                                         }
@@ -260,6 +260,8 @@
     private string selectedDomainResource = null;
 
     private bool addLink = false;
+
+    private string currentLanguage = MainLayout.currentLanguage;
 
     private void ToggleAddLink()
     {

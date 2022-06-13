@@ -16,7 +16,7 @@
         <table border="1">
             <tr>
                 <th colspan="@(m.row.Length+1)">
-                    @Infobase.GetTerm(m.Tp) @m.Id
+                    @Infobase.GetTerm(m.Tp, currentLanguage) @m.Id
                     <AuthorizeView Roles="Admin,Editor">
                         <NavLink href="@("/editor/" + originalRecord.Id)">Редактировать</NavLink>
                     </AuthorizeView>
@@ -34,7 +34,7 @@
                         || ((row is RField) && ((RField)row).Value != null))
                     {
                         nonEmptyFields.Add(row.Prop);
-                        <th class="secondary">@Infobase.GetTerm(row.Prop)</th>
+                        <th class="secondary">@Infobase.GetTerm(row.Prop, currentLanguage)</th>
                     }
 
                 }
@@ -73,8 +73,8 @@
                     <table border="1">
                         <tr class="table-header">
                             <th colspan="@domFields.Length">
-                                <span>@Infobase.GetTerm(inv.Id)</span>
-                                <span>@Infobase.GetTerm(((RLink)domain).Resource)</span>
+                                <span>@Infobase.GetTerm(inv.Id, currentLanguage)</span>
+                                <span>@Infobase.GetTerm(((RLink)domain).Resource, currentLanguage)</span>
                                 <span><input type="checkbox" id="tiles" @onchange="@(f => toggleTilesView(((RLink)domain).Resource))" /> <span>плиткой</span></span>
                             </th>
                         </tr>
@@ -100,7 +100,7 @@
                                                         if (nonEmpty.Count() != 0)
                                                         {
                                                             nonEmptyFields.Add(field.Resource);
-                                                            <th class="secondary">@Infobase.GetTerm(field.Resource)</th>
+                                                            <th class="secondary">@Infobase.GetTerm(field.Resource, currentLanguage)</th>
                                                         }
                                                     }
                                                 </tr>
@@ -137,6 +137,8 @@
     Models.P3Model model = null;
     private RRecord originalRecord;
     private string[] parentTypes;
+
+    private string currentLanguage = MainLayout.currentLanguage;
 
     private List<string> tilesView = new List<string>();
 

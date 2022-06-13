@@ -38,4 +38,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.13" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
   </ItemGroup>
+
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\cassettes\" />
+	</ItemGroup>
 </Project>

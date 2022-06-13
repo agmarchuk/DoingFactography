@@ -23,7 +23,7 @@
         {
             if (Infobase.ront.IsEnumeration(field.Prop) && ((RField)field).Value != null && ((RField)field).Value != "")
             {
-                <td class="d-inline-block">@(Infobase.ront.EnumValue(field.Prop, ((RField)field).Value, "ru"))</td>
+                <td class="d-inline-block">@(Infobase.ront.EnumValue(field.Prop, ((RField)field).Value, MainLayout.currentLanguage))</td>
             }
             else if (((RField)field).Value != null && ((RField)field).Value != "")
             {
@@ -47,7 +47,7 @@ else
             {
                 if (Infobase.ront.IsEnumeration(c.Prop) && ((RField)c).Value != null && ((RField)c).Value != "")
                 {
-                    <td>@(Infobase.ront.EnumValue(c.Prop, ((RField)c).Value, "ru"))</td>
+                    <td>@(Infobase.ront.EnumValue(c.Prop, ((RField)c).Value, MainLayout.currentLanguage))</td>
                 }
                 else
                 {

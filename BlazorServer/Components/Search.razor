@@ -20,7 +20,7 @@
                     {
                         continue;
                     }
-                    <option value="@name">@(Infobase.GetTerm(name))</option>
+                    <option value="@name">@(Infobase.GetTerm(name, MainLayout.currentLanguage))</option>
                 }
             }
 
@@ -57,7 +57,7 @@
         foreach (RRecord rec in query)
         {
             <div>
-                <span>@Infobase.GetTerm(rec.Tp)</span> &nbsp;
+                <span>@Infobase.GetTerm(rec.Tp, MainLayout.currentLanguage)</span> &nbsp;
                 <a href="javasrcipt:void(0);" @onclick="@(e =>SearchResultClick(rec))">@rec.GetName()</a>
             </div>
         }
