@@ -66,7 +66,7 @@ namespace RDFEngine
         }
         private RRecord BuPo(string id, int level, string forbidden)
         {
-            var rec = GetRRecord(id);
+            var rec = GetRRecord(id, true);
             if (rec == null) return null;
             RRecord result_rec = new RRecord()
             {
