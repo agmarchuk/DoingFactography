@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EtalonBlazor", "EtalonBlazo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polar.Universal", "..\PolarDB\Polar.Universal\Polar.Universal.csproj", "{12B303AB-6E78-4478-898F-90D746E74EBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTransformer", "ConsoleTransformer\ConsoleTransformer.csproj", "{53559253-1330-45D6-AF5B-9D8639C9A333}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTransformer", "ConsoleTransformer\ConsoleTransformer.csproj", "{53559253-1330-45D6-AF5B-9D8639C9A333}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

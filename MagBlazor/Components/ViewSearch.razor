@@ -9,7 +9,7 @@
             <option value="@typ">@(Infobase.rontology.LabelOfOnto(typ))</option>
         }
     </select>
-    <span>расш.<input type="checkbox" @bind="extended"/></span>
+    <span>расш.<input type="checkbox" @bind="extended" /></span>
 </div>
 @if (!string.IsNullOrEmpty(searchsample))
 {
@@ -29,12 +29,12 @@
     if (!extended) { query = query.OrderBy(r => Infobase.GetName(r)); }
     foreach (RRecord rec in query)
     {
-<div>
-    <a href="javascript:void(0)" @onclick="@(e =>SearchResultClick(rec))">@Infobase.GetName(rec)</a>
-    <span style="color:red;">@(Infobase.rontology.LabelOfOnto(rec.Tp))</span>
-</div>
+        <div>
+            <a href="javascript:void(0)" @onclick="@(e =>SearchResultClick(rec))">@Infobase.GetName(rec)</a>
+            <span style="color:red;">@(Infobase.rontology.LabelOfOnto(rec.Tp))</span>
+        </div>
     }
-    if (toedit && !string.IsNullOrEmpty(searchtype)) 
+    if (toedit && !string.IsNullOrEmpty(searchtype))
     {
         <div><a href="javascript:void(0)" @onclick="@(e =>NewItemClick(searchtype))">нов.</a></div>
     }
@@ -49,7 +49,7 @@
     public string[] typs { get; set; }
     [Parameter]
     public string user { get; set; }
-    private bool toedit { get { return ! string.IsNullOrEmpty(user); } }
+    private bool toedit { get { return !string.IsNullOrEmpty(user); } }
     private bool extended = false;
 
     private async Task SearchResultClick(RRecord rec)

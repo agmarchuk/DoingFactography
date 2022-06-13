@@ -27,10 +27,23 @@ namespace RDFEngine
         //    }).Aggregate((a, s) => a + ", " + s);
         //    return "{ <" + Id + ">, <" + Tp + ">, " + "[" +       query      + "]}";
         //}
+        public string GetField(string propName)
+        {
+            return ((RField)this.Props.FirstOrDefault(p => p is RField && p.Prop == propName))?.Value;
+        }
+        public RRecord GetDirectResource(string propName)
+        {
+            return ((RDirect)this.Props.FirstOrDefault(p => p is RDirect && p.Prop == propName))?.DRec;
+        }
         public string GetName()
         {
             return ((RField)this.Props.FirstOrDefault(p => p is RField && p.Prop == REngine.propName))?.Value;
-            //throw new Exception("Err: Old variant of GetName()");
+        }
+        public string GetDates()
+        {
+            string df = GetField("http://fogid.net/o/from-date");
+            string dt = GetField("http://fogid.net/o/to-date");
+            return (df == null ? "" : df) + (string.IsNullOrEmpty(dt) ? "" : "-" + dt);
         }
     }
     public abstract class RProperty
