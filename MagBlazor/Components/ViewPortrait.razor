@@ -2,9 +2,13 @@
 
 @if (focusrecord != null)
 {
-    if (focusrecord.Tp == "http://fogid.net/o/person")
+    if (true || focusrecord.Tp == "http://fogid.net/o/person")
     {
         <MagBlazor.Components.ViewPortraitPerson focusrecord="@focusrecord" />
+    }
+    else if (focusrecord.Tp == "http://fogid.net/o/org-sys")
+    {
+        <MagBlazor.Components.ViewPortraitOrgsys focusrecord="@focusrecord" />
     }
 }
 

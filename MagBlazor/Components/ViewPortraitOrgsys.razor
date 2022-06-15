@@ -1,0 +1,49 @@
+﻿@using RDFEngine
+
+@*<p class="grad">
+    <a href="~/Home/Index" class="nov"><img src="~/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
+    &raquo;
+    Орг.системы
+    &raquo;
+    @name
+</p>*@
+
+<div class="heading1">
+    <h1>
+        @name
+        @dates
+    </h1>
+</div>
+
+<p>@description</p>
+
+
+@code {
+    [Parameter]
+    public RRecord focusrecord { get; set; }
+
+    private string name, dates, description;
+    private RRecord[] titles = null;
+    private RRecord[] works = null;
+    private RRecord[] notworks = null;
+    private RRecord[] livings = null;
+
+    protected override void OnInitialized() // = On Page Load
+    {
+        if (focusrecord != null)
+        {
+            name = focusrecord.GetName();
+            dates = focusrecord.GetDates();
+            description = focusrecord.GetField("http://fogid.net/o/description");
+            // Еще можно (?) про папу и маму, потом про детей (?)
+            RRecord erecord = (new RDFEngine.RXEngine() { User = null }).GetRRecord(focusrecord.Id, true);
+            // Группируем обратные отношения по обратным ссылкам
+            var relations = erecord.Props.Where(p => p is RInverseLink && ((RInverseLink)p).Source != null)
+                .Cast<RInverseLink>()
+                .GroupBy(d => d.Prop)
+                .Select(kd => new { propId = kd.Key, list = kd.ToArray() })
+                .ToArray();
+        }
+    }
+
+}

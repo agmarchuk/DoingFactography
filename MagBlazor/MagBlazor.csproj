@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Components\ViewPortraitOrgsys.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ExifLib.Standard" Version="1.7.0" />
     <PackageReference Include="FreeImage.Standard" Version="4.3.8" />
     <PackageReference Include="MediaInfo.Wrapper.Core" Version="21.9.2" />
@@ -21,6 +25,18 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\unsafe_uploads\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\ViewPortraitOrgsys.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\ViewPortraitOrgsys.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Components\ViewPortraitOrgsys.razor" />
   </ItemGroup>
 
 </Project>

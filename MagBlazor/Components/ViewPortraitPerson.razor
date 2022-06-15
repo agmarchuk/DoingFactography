@@ -82,7 +82,7 @@
                 {
                     var place = live.GetDirectResource("http://fogid.net/o/location-place");
                     <a href='/view/@place.Id'>@place.GetName()</a>
-                    <span>&nbsp;</span> 
+                    <span>&nbsp;</span>
                     <span>@(live.GetField("http://fogid.net/o/location-category"))</span>
                 }
             </td>
@@ -121,6 +121,7 @@
             titles = relations.FirstOrDefault(r => r.propId == "http://fogid.net/o/has-title")?.list
                 .Select(pr => (new RDFEngine.RXEngine() { User = null }).GetRRecord(pr.Source))
                 .ToArray();
+
             var participations = relations.FirstOrDefault(r => r.propId == "http://fogid.net/o/participant")?.list
                 .Select(pr =>
                 {
@@ -146,51 +147,55 @@
                 .ToArray();
             // "http://fogid.net/o/org-classification"
             // "organization"
-            works = participations.Where(part => part.Props.Any(p =>
+            if (participations != null)
             {
-                if (p.Prop == "http://fogid.net/o/in-org")
+                works = participations.Where(part => part.Props.Any(p =>
                 {
-                    RRecord rec = ((RDirect)p).DRec;
-                    string oc = rec.GetField("http://fogid.net/o/org-classification");
-                    if (oc == "organization") return true;
-                }
-                return false;
-            })).ToArray();
-            notworks = participations.Where(part => part.Props.All(p =>
-            {
-                if (p.Prop == "http://fogid.net/o/in-org")
+                    if (p.Prop == "http://fogid.net/o/in-org")
+                    {
+                        RRecord rec = ((RDirect)p).DRec;
+                        string oc = rec.GetField("http://fogid.net/o/org-classification");
+                        if (oc == "organization") return true;
+                    }
+                    return false;
+                })).ToArray();
+                notworks = participations.Where(part => part.Props.All(p =>
                 {
-                    RRecord rec = ((RDirect)p).DRec;
-                    string oc = rec.GetField("http://fogid.net/o/org-classification");
-                    if (oc == "organization") return false;
-                }
-                return true;
-            })).ToArray();
+                    if (p.Prop == "http://fogid.net/o/in-org")
+                    {
+                        RRecord rec = ((RDirect)p).DRec;
+                        string oc = rec.GetField("http://fogid.net/o/org-classification");
+                        if (oc == "organization") return false;
+                    }
+                    return true;
+                })).ToArray();
+            }
 
             livings = relations.FirstOrDefault(r => r.propId == "http://fogid.net/o/something")?.list
-    .Select(pr =>
+.Select(pr =>
+{
+    var rec = (new RDFEngine.RXEngine()).GetRRecord(pr.Source, false);
+    return new RRecord
     {
-        var rec = (new RDFEngine.RXEngine()).GetRRecord(pr.Source, false);
-        return new RRecord
+        Id = rec.Id,
+        Tp = rec.Tp,
+        Props = rec.Props.Select(pro =>
         {
-            Id = rec.Id,
-            Tp = rec.Tp,
-            Props = rec.Props.Select(pro =>
-            {
-                if (pro.Prop == pr.Prop) return null; // запрещенное направление
+            if (pro.Prop == pr.Prop) return null; // запрещенное направление
                 RProperty pres = null;
-                if (pro is RField) pres = pro;
-                else if (pro is RLink) pres = new RDirect
-                {
-                    Prop = pro.Prop,
-                    DRec = (new RDFEngine.RXEngine()).GetRRecord(((RLink)pro).Resource, false)
-                };
-                return pres;
-            }).Where(r => r != null).ToArray()
-        };
-    })
-    .ToArray();
+            if (pro is RField) pres = pro;
+            else if (pro is RLink) pres = new RDirect
+            {
+                Prop = pro.Prop,
+                DRec = (new RDFEngine.RXEngine()).GetRRecord(((RLink)pro).Resource, false)
+            };
+            return pres;
+        }).Where(r => r != null).ToArray()
+    };
+})
+.ToArray();
 
         }
+
     }
 }

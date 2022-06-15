@@ -29,8 +29,9 @@
     if (!extended) { query = query.OrderBy(r => Infobase.GetName(r)); }
     foreach (RRecord rec in query)
     {
+        string addrr = "/view/" + rec.Id;
         <div>
-            <a href="javascript:void(0)" @onclick="@(e =>SearchResultClick(rec))">@Infobase.GetName(rec)</a>
+            <NavLink href="@(addrr)">@Infobase.GetName(rec)</NavLink>
             <span style="color:red;">@(Infobase.rontology.LabelOfOnto(rec.Tp))</span>
         </div>
     }

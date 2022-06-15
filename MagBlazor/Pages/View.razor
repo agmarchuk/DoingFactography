@@ -1,5 +1,6 @@
 ﻿@page "/view/{entityId?}"
 @using RDFEngine;
+@inject NavigationManager NavManager
 
 @{
     string lnk = "/edit/" + entityId;
@@ -8,8 +9,9 @@
     </div>
 }
 
-<MagBlazor.Components.Search onSelected="(rid) => UtilizeRecord((string)rid)" searchsample="@searchsample" typs="@tps" user="@user" />
-<MagBlazor.Components.ViewPortrait focusrecord="@focusrecord"/>
+<MagBlazor.Components.ViewSearch onSelected="@((rid) => UtilizeRecord((string)rid))" searchsample="@searchsample" typs="@tps" user="@user" />
+// arg => NavManager.NavigateTo("/view/"+((RRecord)arg).Id)
+<MagBlazor.Components.ViewPortrait focusrecord="@focusrecord" />
 
 @code {
     [Parameter]
@@ -22,15 +24,16 @@
         "http://fogid.net/o/org-sys",
         "http://fogid.net/o/document",
         "http://fogid.net/o/collection"
-        //"http://fogid.net/o/",
-    };
+            //"http://fogid.net/o/",
+        };
     private string user = null;
     private RRecord focusrecord = null;
 
     private void UtilizeRecord(string id)
     {
-        entityId = id;
-        Build(entityId);
+        //entityId = id;
+        //Build(entityId);
+        NavManager.NavigateTo("/view/" + id);
     }
     private void Build(string id)
     {
