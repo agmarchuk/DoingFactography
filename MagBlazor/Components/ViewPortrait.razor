@@ -1,18 +1,186 @@
 ﻿@using RDFEngine
+@using MagBlazor.Models;
 
-@if (focusrecord != null)
-{
-    if (true || focusrecord.Tp == "http://fogid.net/o/person")
+@if (m == null) { return; }
+
+<p class="grad">
+    <a href="view" class="nov"><img src="images/ico-home.gif" class="ico-home" alt="" />Электронный архив</a>
+    &raquo;
+    @m.tp
+    &raquo;
+    @m.name
+</p>
+
+
+<div class="heading1">
+    <h1>
+        @m.name
+        @m.dates
+    </h1>
+</div>
+<p>@m.description</p>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-person">
+    @if (m.titles != null && m.titles.Count() > 0)
     {
-        <MagBlazor.Components.ViewPortraitPerson focusrecord="@focusrecord" />
+        <tr valign="top">
+            <td width="25%" class="line-name">Титул:</td>
+            <td width="75%" class="line-info">
+                @foreach (RRecord tit in m.titles)
+                {
+                    string dts = tit.GetDates();
+                    <span>@tit.GetField("http://fogid.net/o/degree")</span>
+                    if (!string.IsNullOrEmpty(dts))
+                    {
+                        <span> (@dts) </span>
+                    }
+                    <br />
+                }
+            </td>
+        </tr>
     }
-    else if (focusrecord.Tp == "http://fogid.net/o/org-sys")
+    @if (m.works != null && m.works.Count() > 0)
     {
-        <MagBlazor.Components.ViewPortraitOrgsys focusrecord="@focusrecord" />
+        <tr valign="top">
+            <td width="25%" class="line-name">Место работы:</td>
+            <td width="75%" class="line-info">
+                @foreach (var work in m.works.OrderBy(w => w.GetField("http://fogid.net/o/from-date")))
+                {
+                    var org = (new RXEngine()).GetRRecord(work.GetDirectResource("http://fogid.net/o/in-org"));
+                    string nm = org.GetName();
+                    string dt = work.GetDates();
+                    <a href='/view/@org.Id'>@nm</a>
+                    if (!string.IsNullOrEmpty(dt))
+                    {
+                        <span>(@dt)</span>
+                    }
+                    <br />
+                }
+            </td>
+        </tr>
     }
-}
+    @if (m.notworks != null && m.notworks.Count() > 0)
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Участие в мероприятиях:</td>
+            <td width="75%" class="line-info">
+                @foreach (var nwork in m.notworks.OrderBy(w => w.GetField("http://fogid.net/o/from-date")))
+                {
+                    var org = (new RXEngine()).GetRRecord(nwork.GetDirectResource("http://fogid.net/o/in-org"));
+                    string nm = org.GetName();
+                    string dt = nwork.GetDates();
+                    string dto = org.GetDates();
+                    <a href='/view/@org.Id'>@nm</a>
+                    if (!string.IsNullOrEmpty(dt))
+                    {
+                        <span>(@dt)</span>
+                    }
+                    else if (!string.IsNullOrEmpty(dto))
+                    {
+                        <span>(@dto)</span>
+                    }
+                    <br />
+                }
+            </td>
+        </tr>
+    }
+    @if (m.livings != null && m.livings.Count() > 0)
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Геоинформация:</td>
+            <td width="75%" class="line-info">
+                @foreach (var live in m.livings)
+                {
+                    var place = (new RXEngine()).GetRRecord(live.GetDirectResource("http://fogid.net/o/location-place"));
+                    <a href='/view/@place.Id'>@place.GetName()</a>
+                    <span>&nbsp;</span>
+                    <span>@(live.GetField("http://fogid.net/o/location-category"))</span>
+                }
+            </td>
+        </tr>
+    }
+
+    <!--   Из раздела org-sys    -->
+
+    @if (m.participants.Count() > 0)
+    {
+        string word = m.isorg ? "работник" : "участник";
+        <tr valign="top">
+            <td width="25%" class="line-name">@word:</td>
+            <td width="75%" class="line-info">
+                @foreach (var participant in m.participants.Where(pa => pa.GetField("http://fogid.net/o/role-classification") == "director"))
+                {
+                    var personage = (new RXEngine()).GetRRecord(participant.GetDirectResource("http://fogid.net/o/participant"));
+                    string dts = participant.GetDates();
+                    string role = participant.GetField("http://fogid.net/o/role");
+                    string lnk = "view/" + personage.Id;
+                    <NavLink href='@lnk'>@personage.GetName()</NavLink>
+                    <span>@role</span>
+                    if (!string.IsNullOrEmpty(dts))
+                    {
+                        <span>(@dts)</span>
+                    }
+                    <br />
+                }
+                @foreach (var participant in m.participants.Where(pa => pa.GetField("http://fogid.net/o/role-classification") != "director")
+                    .OrderBy(pa => pa.GetName()))
+                {
+                    var personage = (new RXEngine()).GetRRecord(participant.GetDirectResource("http://fogid.net/o/participant"));
+                    if (personage == null) { continue; }
+                    string dts = participant.GetDates();
+                    string role = participant.GetField("http://fogid.net/o/role");
+                    <a href='view/@personage.Id'>@personage.GetName()</a>
+                    <span>@role</span>
+                    if (!string.IsNullOrEmpty(dts))
+                    {
+                        <span>(@dts)</span>
+                    }
+                    <br />
+                }
+
+                @*@foreach (XElement participant in m.participants.Where(pa => SObjects.GetField(pa, "http://fogid.net/o/role-classification") != "director")
+        .OrderBy(pa => SObjects.GetField(pa, "http://fogid.net/o/name")))
+          {
+              XElement personage = participant.Element("direct")?.Element("record");
+              if (personage == null) { continue; }
+              string dts = SObjects.GetDates(participant);
+              string role = SObjects.GetField(participant, "http://fogid.net/o/role");
+              <a href='~/Home/Portrait?id=@personage.Attribute("id").Value'>@SObjects.GetField(personage, "http://fogid.net/o/name")</a>
+              <span>@role</span>
+              if (!string.IsNullOrEmpty(dts))
+              {
+                  <span>(@dts)</span>
+              }
+              <br />
+          }*@
+            </td>
+        </tr>
+    }
+
+</table>
+<br />
+<br />
+
 
 @code {
     [Parameter]
     public RRecord focusrecord { get; set; }
+
+    private PortraitModel4 m = null;
+
+    protected override void OnInitialized() // = On Page Load
+    {
+        Build();
+    }
+    protected override void OnParametersSet() // = On Page Load
+    {
+        Build();
+    }
+    private void Build()
+    {
+        if (focusrecord != null)
+        {
+            m = new PortraitModel4(focusrecord);
+        }
+
+    }
 }

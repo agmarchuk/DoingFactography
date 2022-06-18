@@ -19,8 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagBlazor", "MagBlazor\MagB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polar.DB", "..\PolarDB\src\Polar.DB\Polar.DB.csproj", "{177775A1-03BB-4BC8-A101-95D99190FA94}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polar.TripleStore", "..\PolarDB\src\TripleStore\Polar.TripleStore.csproj", "{18AD7980-A582-4B7A-B1FA-C9C6A0DF1453}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polar.OModel", "..\PolarDB\Polar.OModel\Polar.OModel.csproj", "{F1B58C5C-001D-4D3E-B5D0-631BC712699B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OAData", "..\PolarArchiving\src\OAData\OAData.csproj", "{6F8D2E14-AD5F-41AA-AA67-4F13530C34AC}"
@@ -69,10 +67,6 @@ Global
 		{177775A1-03BB-4BC8-A101-95D99190FA94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{177775A1-03BB-4BC8-A101-95D99190FA94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{177775A1-03BB-4BC8-A101-95D99190FA94}.Release|Any CPU.Build.0 = Release|Any CPU
-		{18AD7980-A582-4B7A-B1FA-C9C6A0DF1453}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{18AD7980-A582-4B7A-B1FA-C9C6A0DF1453}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{18AD7980-A582-4B7A-B1FA-C9C6A0DF1453}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{18AD7980-A582-4B7A-B1FA-C9C6A0DF1453}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F1B58C5C-001D-4D3E-B5D0-631BC712699B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F1B58C5C-001D-4D3E-B5D0-631BC712699B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1B58C5C-001D-4D3E-B5D0-631BC712699B}.Release|Any CPU.ActiveCfg = Release|Any CPU

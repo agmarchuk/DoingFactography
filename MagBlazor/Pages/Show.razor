@@ -1,0 +1,68 @@
+﻿@page "/show/{entityId?}"
+@using RDFEngine;
+
+<h3>Show item @entityId</h3>
+<div>id: @erecord.Id</div>
+<div>type: @erecord.Tp</div>
+<table border="1">
+    @foreach (RProperty prop in erecord.Props)
+    {
+        if (prop is RField)
+        {
+            RField f = (RField)prop;
+            string val = "\"" + f.Value + "\"" + (f.Lang == null ? "" : "@" + f.Lang);
+            <tr>
+                <td></td>
+                <td>@prop.Prop</td>
+                <td>@val</td>
+            </tr>
+        }
+        else if (prop is RLink)
+        {
+            RLink f = (RLink)prop;
+            string lnk = "show/" + f.Resource;
+            <tr>
+                <td></td>
+                <td>@prop.Prop</td>
+                <td><NavLink href="@lnk">@(f.Resource)</NavLink></td>
+            </tr>
+        }
+        else if (prop is RInverseLink)
+        {
+            RInverseLink f = (RInverseLink)prop;
+            string lnk = "show/" + f.Source;
+            <tr>
+                <td><NavLink href="@lnk">@(f.Source)</NavLink></td>
+                <td>@prop.Prop</td>
+                <td></td>
+            </tr>
+        }
+        else
+        {
+            RLink f = (RLink)prop;
+            <tr>
+                <td rowspan="5">Error</td>
+            </tr>
+        }
+    }
+</table>
+
+    @code {
+        [Parameter]
+        public string entityId { get; set; }
+
+        private RRecord erecord { get; set; }
+
+        private void Build(string id)
+        {
+            erecord = (new RXEngine()).GetRRecord(id, true);
+        }
+        protected override void OnParametersSet()
+        {
+            if (entityId != null)
+            {
+                Build(entityId);
+            }
+        }
+
+    }

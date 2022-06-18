@@ -10,7 +10,7 @@
 }
 
 <MagBlazor.Components.ViewSearch onSelected="@((rid) => UtilizeRecord((string)rid))" searchsample="@searchsample" typs="@tps" user="@user" />
-// arg => NavManager.NavigateTo("/view/"+((RRecord)arg).Id)
+
 <MagBlazor.Components.ViewPortrait focusrecord="@focusrecord" />
 
 @code {
@@ -47,4 +47,12 @@
             Build(entityId);
         }
     }
+    protected override void OnParametersSet()
+    {
+        if (entityId != null)
+        {
+            Build(entityId);
+        }
+    }
+
 }

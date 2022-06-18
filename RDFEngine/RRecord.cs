@@ -31,9 +31,13 @@ namespace RDFEngine
         {
             return ((RField)this.Props.FirstOrDefault(p => p is RField && p.Prop == propName))?.Value;
         }
-        public RRecord GetDirectResource(string propName)
+        public string GetDirectResource(string propName)
         {
-            return ((RDirect)this.Props.FirstOrDefault(p => p is RDirect && p.Prop == propName))?.DRec;
+            var prop = this.Props.FirstOrDefault(p => p.Prop == propName);
+            if (prop == null) return null;
+            if (prop is RLink) return ((RLink)prop).Resource;
+            if (prop is RDirect) return ((RDirect)prop).DRec?.Id;
+            return null;
         }
         public string GetName()
         {

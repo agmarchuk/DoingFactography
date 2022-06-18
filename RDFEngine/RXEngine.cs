@@ -87,6 +87,7 @@ namespace RDFEngine
         }
         public RRecord GetRRecord(string id)
         {
+            if (id == null) return null;
             return GetRRecord(id, false);
         }
         public RRecord GetRRecord(string id, bool addinverse)
