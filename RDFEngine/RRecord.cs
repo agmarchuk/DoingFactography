@@ -51,6 +51,26 @@ namespace RDFEngine
         {
             return ((RField)this.Props.FirstOrDefault(p => p is RField && p.Prop == REngine.propName))?.Value;
         }
+        public string GetName(string lang)
+        {
+            var name = ((RField)this.Props.FirstOrDefault(p => p is RField && ((RField)p).Lang == lang && p.Prop == REngine.propName));
+            if (name != null)
+            {
+                return name.Value;
+            }
+            else
+            {
+                name = ((RField)this.Props.FirstOrDefault(p => p is RField && p.Prop == REngine.propName));
+                var langName = (name.Lang == null) ? "ru" : name.Lang;
+                if (langName != lang)
+                {
+                    return name.Value + " (" + langName + ")";
+                } else
+                {
+                    return name.Value;
+                }
+            }
+        }
         public string GetDates()
         {
             string df = GetField("http://fogid.net/o/from-date");

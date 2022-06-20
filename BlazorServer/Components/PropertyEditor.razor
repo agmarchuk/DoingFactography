@@ -2,7 +2,19 @@
 
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
 
-
+<select @onchange="@(e => LangChangeHandler(e.Value))">
+    @foreach(var lang in MainLayout.languages)
+    {
+        if (lang.code == currentLanguage)
+        {
+            <option selected="selected" value="@lang.code">@lang.name</option>
+        }
+        else
+        {
+            <option value="@lang.code">@lang.name</option>
+        }
+    }
+</select>
 @if (addRecord && recToAdd.Id == null)
 {
     //string id = ((REngine)(Infobase.engine)).NewRelation(addRecordType, forbidden, originalRecord.Id);
@@ -115,7 +127,28 @@ else
                         } 
                         else
                         {
+                            if (Infobase.isTranslatable(bindProperty.Prop))
+                            {
+                                var lang = ((RField)bindProperty).Lang;
+                                var current = r.Props.FirstOrDefault(prop => prop is RField && 
+                                    prop.Prop == bindProperty.Prop && ((RField)prop).Lang == currentLanguage);
+                                if (lang != currentLanguage && current == null)
+                                {
+                                    var field = new RField();
+                                    field.Prop = bindProperty.Prop;
+                                    field.Lang = currentLanguage;
+                                    field.Value = "";
+                                    r.Props = r.Props.Append(field).ToArray();
+                                    bindProperty = field;
+                                } 
+                                else
+                                {
+                                    bindProperty = current;
+                                }
+                            }
+                            
                             <span><input type="text" @bind-value="@(((RField)bindProperty).Value)" /></span>
+                            
                         }
                     }
                     else if (bindProperty is RDirect)
@@ -135,7 +168,7 @@ else
 
                                 }
 
-                                <a href="javascript:void(0)" @onclick="@(e => BuildPortrait(rr.Id))">@rr.GetName()</a>
+                                <a href="javascript:void(0)" @onclick="@(e => BuildPortrait(rr.Id))">@rr.GetName(currentLanguage)</a>
                             }
                             else
                             {
@@ -159,7 +192,7 @@ else
                                     </a>
 
                                 }
-                                <span>@rr.GetName()</span>
+                                <span>@rr.GetName(currentLanguage)</span>
                             }
                             <br /><span>Поиск:</span>
                             string range = null;
@@ -250,5 +283,10 @@ else
     private void SelectChangeHandler(object e, RProperty bindProperty)
     {
         ((RField)bindProperty).Value = e.ToString();
+    }
+
+    private void LangChangeHandler(object lang)
+    {
+        currentLanguage = lang.ToString();
     }
 }

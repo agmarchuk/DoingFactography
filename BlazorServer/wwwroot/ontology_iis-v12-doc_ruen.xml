@@ -96,6 +96,8 @@
     <state value="assotiation" xml:lang="en">association</state>
     <state value="holding" xml:lang="ru">холдинг</state>
     <state value="holding" xml:lang="en">holding</state>
+	<state value="mastersk" xml:lang="ru">мастерская</state>
+	<state value="mastersk" xml:lang="en">workshop</state>
   </EnumerationType>
   <DatatypeProperty rdf:about="http://fogid.net/o/org-category" priority="ac">
     <label xml:lang="ru">вид.орг.</label>

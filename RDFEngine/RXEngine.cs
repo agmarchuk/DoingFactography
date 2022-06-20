@@ -75,7 +75,7 @@ namespace RDFEngine
                 Props = rec.Props.Select<RProperty, RProperty>(p =>
                 {
                     if (p is RField)
-                        return new RField() { Prop = p.Prop, Value = ((RField)p).Value, Lang = ((RField)p).Lang };
+                        return new RField() { Prop = p.Prop, Value = ((RField)p).Value, Lang = ((RField)p).Lang == null ? "ru" : ((RField)p).Lang };
                     else if (level > 0 && p is RLink && p.Prop != forbidden)
                         return new RDirect() { Prop = p.Prop, DRec = BuPo(((RLink)p).Resource, 0, null) };
                     else if (level > 1 && p is RInverseLink)
@@ -224,13 +224,18 @@ namespace RDFEngine
 
         public void Update(RRecord record)
         {
+            Update(record, null);
+        }
+
+        public void Update(RRecord record, string user)
+        {
             var xres = new XElement(ToXName(record.Tp),
                     (record.Id == null ? null : new XAttribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about", record.Id)),
                     record.Props.Select(p =>
                     {
                         if (p is RField)
                         {
-                            return new XElement(ToXName(p.Prop), ((RField)p).Value, 
+                            return new XElement(ToXName(p.Prop), ((RField)p).Value,
                                 ((RField)p).Lang == null ? null : new XAttribute("{http://www.w3.org/XML/1998/namespace}lang", ((RField)p).Lang));
                         }
                         else if (p is RLink)
@@ -247,34 +252,6 @@ namespace RDFEngine
                         return null;
                     }).Where(x => x != null),
                     new XAttribute("owner", User));
-            var res = OAData.OADB.UpdateItem(xres);
-            if (res.Name == "error") throw new Exception(res.Value);
-        }
-
-        public void Update(RRecord record, string user)
-        {
-            var xres = new XElement(ToXName(record.Tp),
-                    (record.Id == null ? null : new XAttribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about", record.Id)),
-                    record.Props.Select(p =>
-                    {
-                        if (p is RField)
-                        {
-                            return new XElement(ToXName(p.Prop), ((RField)p).Value);
-                        }
-                        else if (p is RLink)
-                        {
-                            return new XElement(ToXName(p.Prop),
-                                new XAttribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource", ((RLink)p).Resource));
-                        }
-                        else if (p is RDirect)
-                        {
-                            if (((RDirect)p).DRec == null) return null;
-                            return new XElement(ToXName(p.Prop),
-                                new XAttribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource", ((RDirect)p).DRec.Id));
-                        }
-                        return null;
-                    }).Where(x => x != null),
-                    new XAttribute("owner", user));
             var res = OAData.OADB.UpdateItem(xres);
             if (res.Name == "error") throw new Exception(res.Value);
         }

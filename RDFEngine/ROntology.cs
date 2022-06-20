@@ -178,14 +178,9 @@ namespace RDFEngine
 
                 propsList.AddRange(sortedProps.Select(p => new RLink { Prop = ename(p), Resource = p.Attribute(rdf + "about").Value }));
 
-                if (el.Name == "DatatypeProperty" || el.Name == "ObjectProperty")
-                {
-                    propsList.AddRange(el.Elements("domain").Select(x => new RLink { Prop = "domain", Resource = x.Attribute(rdf + "resource").Value }));
-                }
-                if (el.Name.LocalName == "ObjectProperty")
-                {
-                    propsList.AddRange(el.Elements("range").Select(x => new RLink { Prop = "range", Resource = x.Attribute(rdf + "resource").Value }));
-                }
+                propsList.AddRange(el.Elements("domain").Select(x => new RLink { Prop = "domain", Resource = x.Attribute(rdf + "resource").Value }));
+                propsList.AddRange(el.Elements("range").Select(x => new RLink { Prop = "range", Resource = x.Attribute(rdf + "resource").Value }));
+                
 
 
                 rec.Props = propsList.ToArray();

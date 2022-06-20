@@ -58,7 +58,7 @@
         {
             <div>
                 <span>@Infobase.GetTerm(rec.Tp, MainLayout.currentLanguage)</span> &nbsp;
-                <a href="javasrcipt:void(0);" @onclick="@(e =>SearchResultClick(rec))">@rec.GetName()</a>
+                <a href="javasrcipt:void(0);" @onclick="@(e =>SearchResultClick(rec))">@rec.GetName(MainLayout.currentLanguage)</a>
             </div>
         }
     }

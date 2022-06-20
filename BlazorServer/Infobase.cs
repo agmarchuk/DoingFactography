@@ -64,5 +64,16 @@ namespace BlazorServer
             return result == null ? ((RField)labels.FirstOrDefault())?.Value : result;
         }
 
+        public static bool isTranslatable(string id)
+        {
+            var record = ront.rontology.FirstOrDefault(rec => rec.Id == id);
+            var resource = ((RLink)record?.Props.FirstOrDefault(p => p.Prop == "range"))?.Resource;
+            if (resource != null && resource == "http://fogid.net/o/text")
+            {
+                return true;
+            }
+            return false;
+        }
+
     }
 }

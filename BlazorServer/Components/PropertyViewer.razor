@@ -51,7 +51,13 @@ else
                 }
                 else
                 {
-                   <td>@(((RField)c).Value)</td> 
+                    var postfix = (((RField)c).Lang == MainLayout.currentLanguage) ? "" : " (" + ((RField)c).Lang + ")";
+                    if (String.IsNullOrEmpty(((RField)c).Value) || !Infobase.isTranslatable(c.Prop))
+                    {
+                        postfix = "";
+                    }
+                    <td>@(((RField)c).Value + postfix)</td> 
+
                 }
             
             }
@@ -71,7 +77,7 @@ else
             }
             else
             {
-                <td><a href="@("/viewer/" + rr.Id)">@(rr.GetName())</a></td>
+                <td><a href="@("/viewer/" + rr.Id)">@(rr.GetName(MainLayout.currentLanguage))</a></td>
             }
 
         }
