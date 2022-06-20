@@ -26,7 +26,7 @@
     if (focusRec.Tp == "http://fogid.net/o/video-doc")
     {
         string sr = "docs/GetVideo?u=" + ((RField)focusRec.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri")).Value + "&s=normal";
-        <video controls>
+        <video width="480" controls>
             <source type="video/webm" src='@(sr + "&ext=webm")' />
             <source type="video/mp4" src='@(sr + "&ext=mp4")' />
             Your browser does not support the video tag.

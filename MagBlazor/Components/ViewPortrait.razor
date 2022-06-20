@@ -15,11 +15,129 @@
 <div class="heading1">
     <h1>
         @m.name
-        @m.dates
     </h1>
 </div>
-<p>@m.description</p>
+
+@if (externalId != null)
+{
+    string pr = "/view/" + m.prev + "/" + externalId;
+    string d = "/view/" + externalId;
+    string nx = "/view/" + m.next + "/" + externalId;
+    <div style="text-align: center;">
+        <NavLink href="@d">к документу</NavLink>
+        &nbsp;
+        @if (m.prev == null)
+        {
+            <span>пред.</span>
+        }
+        else
+        {
+            <NavLink href="@pr"><span>пред.</span></NavLink>
+        }
+        &nbsp;
+        @if (m.next == null)
+        {
+            <span>след.</span>
+        }
+        else
+        {
+            <NavLink href="@nx"><span>след.</span></NavLink>
+        }
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(m.uri) && m.Tp == "http://fogid.net/o/photo-doc")
+{
+    string sr = "/Docs/GetImage?u=" + m.uri + "&s=medium";
+    <div style="text-align: center;">
+        <img src="@sr" />
+    </div>
+}
+else if (!string.IsNullOrEmpty(m.uri) && m.Tp == "http://fogid.net/o/video-doc")
+{
+    string sr = "/Docs/GetVideo?u=" + m.uri;
+    <div style="text-align: center;">
+        <video src="@sr" />
+    </div>
+}
+
 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-person">
+    @if (!string.IsNullOrEmpty(m.fd) || !string.IsNullOrEmpty(m.td))
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Дата(ы):</td>
+            <td width="75%" class="line-info">
+                @(m.dates)
+            </td>
+        </tr>
+    }
+    @if (!string.IsNullOrEmpty(m.description))
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Описание документа:</td>
+            <td width="75%" class="line-info">@m.description</td>
+        </tr>
+    }
+    @if (m.indoc_parts != null && m.indoc_parts.Count() > 0)
+    {
+        <tr>
+            <td class="doc-show-small">&nbsp;</td>
+            <td class="doc-show-small">
+                @foreach (var docpart in m.indoc_parts)
+                {
+                    RRecord pitem = docpart.GetDirect("http://fogid.net/o/partItem");
+                    string nm = pitem.GetName();
+                    string uri = pitem.GetField("http://fogid.net/o/uri");
+
+                    if (uri != null && uri.StartsWith("iiss://"))
+                    {
+                        string sr = "/Docs/GetImage?u=" + uri + "&s=small";
+                        string lnk = "/view/" + pitem.Id + "/" + m.Id;
+                        <div class="show-small">
+                            <NavLink href="@lnk">
+                                <img src="@sr" border="0" vspace="10" hspace="10" alt="" />
+                            </NavLink>
+                            <br />
+                            @docpart.GetField("http://fogid.net/o/pageNumbers")
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="show-small">
+                            <a href="@uri">
+                                <img src="/images/photo.jpg" />
+                            </a>
+                            <br />
+                            @docpart.GetField("http://fogid.net/o/pageNumbers")
+                        </div>
+                    }
+                }
+            </td>
+        </tr>
+    }
+    @if (!string.IsNullOrEmpty(m.doccontent))
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Текст документа:</td>
+            <td width="75%" class="line-info">@m.doccontent</td>
+        </tr>
+    }
+    @if (m.indoc_reflections != null && m.indoc_reflections.Count() > 0)
+    {
+        string sep = "";
+        <tr valign="top">
+            <td width="25%" class="line-name">Отраженные персонажи:</td>
+            <td width="75%" class="line-info">
+                @foreach (var refle in m.indoc_reflections.Where(re => re != null))
+                {
+                    RRecord who = refle.GetDirect("http://fogid.net/o/reflected");
+                    string lnk = "/view/" + who.Id;
+                    @sep; sep = ", "; <NavLink href='@lnk'>@who.GetName()</NavLink>;
+                }
+            </td>
+        </tr>
+    }
+
     @if (m.titles != null && m.titles.Count() > 0)
     {
         <tr valign="top">
@@ -122,7 +240,7 @@
                     <br />
                 }
                 @foreach (var participant in m.participants.Where(pa => pa.GetField("http://fogid.net/o/role-classification") != "director")
-                    .OrderBy(pa => pa.GetName()))
+            .OrderBy(pa => pa.GetName()))
                 {
                     var personage = (new RXEngine()).GetRRecord(participant.GetDirectResource("http://fogid.net/o/participant"));
                     if (personage == null) { continue; }
@@ -138,23 +256,24 @@
                 }
 
                 @*@foreach (XElement participant in m.participants.Where(pa => SObjects.GetField(pa, "http://fogid.net/o/role-classification") != "director")
-        .OrderBy(pa => SObjects.GetField(pa, "http://fogid.net/o/name")))
-          {
-              XElement personage = participant.Element("direct")?.Element("record");
-              if (personage == null) { continue; }
-              string dts = SObjects.GetDates(participant);
-              string role = SObjects.GetField(participant, "http://fogid.net/o/role");
-              <a href='~/Home/Portrait?id=@personage.Attribute("id").Value'>@SObjects.GetField(personage, "http://fogid.net/o/name")</a>
-              <span>@role</span>
-              if (!string.IsNullOrEmpty(dts))
-              {
-                  <span>(@dts)</span>
-              }
-              <br />
-          }*@
+                    .OrderBy(pa => SObjects.GetField(pa, "http://fogid.net/o/name")))
+                        {
+                            XElement personage = participant.Element("direct")?.Element("record");
+                            if (personage == null) { continue; }
+                            string dts = SObjects.GetDates(participant);
+                            string role = SObjects.GetField(participant, "http://fogid.net/o/role");
+                            <a href='~/Home/Portrait?id=@personage.Attribute("id").Value'>@SObjects.GetField(personage, "http://fogid.net/o/name")</a>
+                            <span>@role</span>
+                            if (!string.IsNullOrEmpty(dts))
+                            {
+                                <span>(@dts)</span>
+                            }
+                            <br />
+                        }*@
             </td>
         </tr>
     }
+
 
 </table>
 <br />
@@ -164,6 +283,9 @@
 @code {
     [Parameter]
     public RRecord focusrecord { get; set; }
+
+    [Parameter]
+    public string externalId { get; set; }
 
     private PortraitModel4 m = null;
 
@@ -179,7 +301,7 @@
     {
         if (focusrecord != null)
         {
-            m = new PortraitModel4(focusrecord);
+            m = new PortraitModel4(focusrecord, externalId);
         }
 
     }

@@ -24,7 +24,7 @@
     }
 
 
-    if (string.IsNullOrEmpty(searchtype)) query = query.Where(r => typs.Contains(r.Tp));
+    if (string.IsNullOrEmpty(searchtype)) { } // query = query.Where(r => typs.Contains(r.Tp));
     else query = query.Where(r => r.Tp == searchtype);
     if (!extended) { query = query.OrderBy(r => Infobase.GetName(r)); }
     foreach (RRecord rec in query)
@@ -66,4 +66,8 @@
         await onSelected.InvokeAsync(nid);
     }
     private string searchtype;
+    protected override void OnParametersSet() // = On Page Load
+    {
+        
+    }
 }

@@ -39,6 +39,14 @@ namespace RDFEngine
             if (prop is RDirect) return ((RDirect)prop).DRec?.Id;
             return null;
         }
+        public RRecord GetDirect(string propName)
+        {
+            if (propName == null) return null;
+            var prop = this.Props.FirstOrDefault(p => p.Prop == propName);
+            if (prop == null) return null;
+            if (prop is RDirect) return ((RDirect)prop).DRec;
+            return null;
+        }
         public string GetName()
         {
             return ((RField)this.Props.FirstOrDefault(p => p is RField && p.Prop == REngine.propName))?.Value;

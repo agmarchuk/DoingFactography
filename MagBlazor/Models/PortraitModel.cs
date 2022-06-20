@@ -6,7 +6,7 @@ namespace MagBlazor.Models
 {
     public class PortraitModel4
     {
-        public string tp, name, fd, td, description, uri;
+        public string Id, Tp, tp, name, fd, td, description, uri, doccontent;
         public string dates { get { return (fd == null ? "" : fd) + (string.IsNullOrEmpty(td) ? "" : "-" + td); } }
         public bool isorg = false;
         public RRecord[] titles = null;
@@ -14,9 +14,42 @@ namespace MagBlazor.Models
         public RRecord[] notworks = null;
         public RRecord[] livings = null;
         public RRecord[] participants = null;
+        public RRecord[] indoc_parts = null; // от документа к частям
+        //public RRecord[] item_parts = null; // от части к общим документам (может только 1?)
+        public RRecord[] indoc_reflections = null; // от документа к отражениям
+        public string todocument = null; // отказался от предыдущего поля в пользу конкретных Id направлений
+        public string prev = null;
+        public string next = null;
 
-        public PortraitModel4(RRecord rec)
+        public PortraitModel4(RRecord rec, string eid)
         {
+            if (eid != null)
+            {
+                todocument = eid;
+                var eeid = (new RXEngine()).GetRRecord(eid, true);
+                var docwithparts = BuildTree(eid, new RRecord
+                {
+                    Props = new RProperty[]
+                    {
+                        new RInverse { Prop = "http://fogid.net/o/inDocument", IRec = new RRecord { Props = new RProperty[]
+                        {
+                            new RField { Prop = "http://fogid.net/o/pageNumbers" },
+                            new RDirect { Prop = "http://fogid.net/o/partItem" }
+                        }} }
+                    }
+                });
+                string[] part_list = new string[0];
+                part_list = docwithparts.Props.Cast<RInverse>()
+                    .OrderBy(prt => prt.IRec.GetField("http://fogid.net/o/pageNumbers"))
+                    .Select(prt => prt.IRec.GetDirectResource("http://fogid.net/o/partItem"))
+                    .ToArray();
+                int ind = System.Array.IndexOf(part_list, rec.Id);
+                if (ind >= 0)
+                {
+                    if (ind - 1 >= 0) prev = part_list[ind - 1];
+                    if (ind + 1 < part_list.Count()) next = part_list[ind + 1];
+                }
+            }
             RRecord format = new RRecord
             {
                 Props = new RProperty[]
@@ -26,6 +59,7 @@ namespace MagBlazor.Models
                     new RField { Prop = "http://fogid.net/o/to-date" },
                     new RField { Prop = "http://fogid.net/o/description" },
                     new RField { Prop = "http://fogid.net/o/uri" },
+                    new RField { Prop = "http://fogid.net/o/doc-content" },
                     new RInverse { Prop = "http://fogid.net/o/has-title" },
                     new RInverse { Prop = "http://fogid.net/o/participant" },
                     new RInverse { Prop = "http://fogid.net/o/something", IRec = new RRecord { Props = new RProperty[] 
@@ -39,22 +73,43 @@ namespace MagBlazor.Models
                             new RField { Prop = "http://fogid.net/o/role-classification" },
                             new RField { Prop = "http://fogid.net/o/role" },
                             new RDirect { Prop = "http://fogid.net/o/participant" }
-                        }  }}
-
+                        }  } },
+                    new RInverse { Prop = "http://fogid.net/o/inDocument", IRec = new RRecord { Props = new RProperty[]
+                        {
+                            new RField { Prop = "http://fogid.net/o/pageNumbers" },
+                            new RDirect { Prop = "http://fogid.net/o/partItem"  }
+                        }  } },
+                    //new RInverse { Prop = "http://fogid.net/o/partItem", IRec = new RRecord { Props = new RProperty[]
+                    //    {
+                    //        new RField { Prop = "http://fogid.net/o/pageNumbers" },
+                    //        new RDirect { Prop = "http://fogid.net/o/inDocument"  }
+                    //    }  } }, 
+                    new RInverse { Prop = "http://fogid.net/o/in-doc", IRec = new RRecord { Props = new RProperty[]
+                        {
+                            new RField { Prop = "http://fogid.net/o/ground" },
+                            new RDirect { Prop = "http://fogid.net/o/reflected" }
+                        }  } },
 
                 }
             };
             RRecord tree = BuildTree(rec.Id, format);
+            Id = tree.Id;
+            Tp = tree.Tp;
             tp = Infobase.rontology.LabelOfOnto(tree.Tp);
             name = tree.GetName();
             fd = tree.GetField("http://fogid.net/o/from-date");
             td = tree.GetField("http://fogid.net/o/to-date");
             description = tree.GetField("http://fogid.net/o/description");
+            doccontent = tree.GetField("http://fogid.net/o/doc-content");
+            uri = tree.GetField("http://fogid.net/o/uri");
 
             List<RRecord> tits = new List<RRecord>();
             List<RRecord> parts = new List<RRecord>();
             List<RRecord> livs = new List<RRecord>();
             List<RRecord> partis = new List<RRecord>();
+            List<RRecord> indoc_docpart = new List<RRecord>();
+            //List<RRecord> item_docpart = new List<RRecord>();
+            List<RRecord> indoc_refl = new List<RRecord>();
             foreach (var qq in tree.Props.Where(p => p is RInverse))
             {
                 RInverse inv = (RInverse)qq;
@@ -87,10 +142,25 @@ namespace MagBlazor.Models
                 {
                     partis.Add(inv.IRec);
                 }
+                else if (inv.Prop == "http://fogid.net/o/inDocument")
+                {
+                    indoc_docpart.Add(inv.IRec);
+                }
+                else if (inv.Prop == "http://fogid.net/o/partItem")
+                {
+                    indoc_docpart.Add(inv.IRec);
+                }
+                else if (inv.Prop == "http://fogid.net/o/in-doc")
+                {
+                    indoc_refl.Add(inv.IRec);
+                }
             }
             titles = tits.ToArray();
             livings = livs.ToArray();
             participants = partis.ToArray();
+            indoc_parts = indoc_docpart.OrderBy(dp => dp.GetField("http://fogid.net/o/pageNumbers")).ToArray();
+            //item_parts = item_docpart.ToArray();
+            indoc_reflections = indoc_refl.ToArray();
 
             if (parts.Count > 0)
             {
@@ -162,8 +232,7 @@ namespace MagBlazor.Models
                                 };
 
                             }
-                                
-
+ 
                             return new RInverse
                             {
                                 Prop = prop_id,

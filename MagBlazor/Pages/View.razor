@@ -1,4 +1,4 @@
-﻿@page "/view/{entityId?}"
+﻿@page "/view/{entityId?}/{eid?}"
 @using RDFEngine;
 @inject NavigationManager NavManager
 
@@ -11,11 +11,14 @@
 
 <MagBlazor.Components.ViewSearch onSelected="@((rid) => UtilizeRecord((string)rid))" searchsample="@searchsample" typs="@tps" user="@user" />
 
-<MagBlazor.Components.ViewPortrait focusrecord="@focusrecord" />
+<MagBlazor.Components.ViewPortrait focusrecord="@focusrecord" externalId="@eid" />
 
 @code {
     [Parameter]
     public string entityId { get; set; }
+
+    [Parameter]
+    public string eid { get; set; }
 
     private string searchsample;
     private string[] tps = new string[]
