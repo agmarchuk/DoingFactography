@@ -240,7 +240,7 @@ else if (!string.IsNullOrEmpty(m.uri) && m.Tp == "http://fogid.net/o/video-doc")
                     <br />
                 }
                 @foreach (var participant in m.participants.Where(pa => pa.GetField("http://fogid.net/o/role-classification") != "director")
-            .OrderBy(pa => pa.GetName()))
+ .OrderBy(pa => pa.GetName()))
                 {
                     var personage = (new RXEngine()).GetRRecord(participant.GetDirectResource("http://fogid.net/o/participant"));
                     if (personage == null) { continue; }
@@ -279,6 +279,95 @@ else if (!string.IsNullOrEmpty(m.uri) && m.Tp == "http://fogid.net/o/video-doc")
 <br />
 <br />
 
+<hr />
+<div>@look</div>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-person">
+    @{
+        string fd = mm.GetField(1);
+        string td = mm.GetField(2);
+        string description = mm.GetField(3);
+    }
+    @if (!string.IsNullOrEmpty(fd) || !string.IsNullOrEmpty(td))
+    {
+        string dates = (fd == null ? "" : fd) + (string.IsNullOrEmpty(td) ? "" : "-" + td);
+        <tr valign="top">
+            <td width="25%" class="line-name">Дата(ы):</td>
+            <td width="75%" class="line-info">
+                @(dates)
+            </td>
+        </tr>
+    }
+    @if (!string.IsNullOrEmpty(description))
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Описание документа:</td>
+            <td width="75%" class="line-info">@description</td>
+        </tr>
+    }
+    @{ RRecord[] indoc_parts = mm.GetMultiInverse(10); }
+    @if (indoc_parts != null && indoc_parts.Count() > 0)
+    {
+        <tr>
+            <td class="doc-show-small">&nbsp;</td>
+            <td class="doc-show-small">
+                @foreach (var docpart in indoc_parts)
+                {
+                    RRecord pitem = docpart.GetDirect("http://fogid.net/o/partItem");
+                    string nm = pitem.GetName();
+                    string uri = pitem.GetField("http://fogid.net/o/uri");
+
+                    if (uri != null && uri.StartsWith("iiss://"))
+                    {
+                        string sr = "/Docs/GetImage?u=" + uri + "&s=small";
+                        string lnk = "/view/" + pitem.Id + "/" + mm.Id;
+                        <div class="show-small">
+                            <NavLink href="@lnk">
+                                <img src="@sr" border="0" vspace="10" hspace="10" alt="" />
+                            </NavLink>
+                            <br />
+                            @docpart.GetField("http://fogid.net/o/pageNumbers")
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="show-small">
+                            <a href="@uri">
+                                <img src="/images/photo.jpg" />
+                            </a>
+                            <br />
+                            @docpart.GetField("http://fogid.net/o/pageNumbers")
+                        </div>
+                    }
+                }
+            </td>
+        </tr>
+    }
+    @{  string doccontent = mm.GetField(5); }
+    @if (!string.IsNullOrEmpty(doccontent))
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Текст документа:</td>
+            <td width="75%" class="line-info">@doccontent</td>
+        </tr>
+    }
+    @if (m.indoc_reflections != null && m.indoc_reflections.Count() > 0)
+    {
+        string sep = "";
+        <tr valign="top">
+            <td width="25%" class="line-name">Отраженные персонажи:</td>
+            <td width="75%" class="line-info">
+                @foreach (var refle in m.indoc_reflections.Where(re => re != null))
+                {
+                    RRecord who = refle.GetDirect("http://fogid.net/o/reflected");
+                    string lnk = "/view/" + who.Id;
+                    @sep; sep = ", "; <NavLink href='@lnk'>@who.GetName()</NavLink>;
+                }
+            </td>
+        </tr>
+    }
+
+</table>
+
 
 @code {
     [Parameter]
@@ -288,6 +377,7 @@ else if (!string.IsNullOrEmpty(m.uri) && m.Tp == "http://fogid.net/o/video-doc")
     public string externalId { get; set; }
 
     private PortraitModel4 m = null;
+    private RRecord mm = null;
 
     protected override void OnInitialized() // = On Page Load
     {
@@ -297,12 +387,53 @@ else if (!string.IsNullOrEmpty(m.uri) && m.Tp == "http://fogid.net/o/video-doc")
     {
         Build();
     }
+    private string look;
     private void Build()
     {
         if (focusrecord != null)
         {
             m = new PortraitModel4(focusrecord, externalId);
+            mm = PortraitModel5.BuildMultiTree(focusrecord.Id, format);
+            look = mm.Id + " " + mm.Tp + " " + mm.Props.Length;
         }
 
     }
+    RRecord format = new RRecord
+    {
+        Props = new RProperty[]
+    {
+@*0*@ new RField { Prop = "http://fogid.net/o/name" },
+@*1*@ new RField { Prop = "http://fogid.net/o/from-date" },
+@*2*@ new RField { Prop = "http://fogid.net/o/to-date" },
+@*3*@ new RField { Prop = "http://fogid.net/o/description" },
+@*4*@ new RField { Prop = "http://fogid.net/o/uri" },
+@*5*@ new RField { Prop = "http://fogid.net/o/doc-content" },
+@*6*@ new RInverse { Prop = "http://fogid.net/o/has-title" },
+@*7*@ new RInverse { Prop = "http://fogid.net/o/participant" },
+@*8*@ new RInverse { Prop = "http://fogid.net/o/something", IRec = new RRecord { Props = new RProperty[]
+                        {
+                            new RField { Prop = "http://fogid.net/o/location-category" },
+                            new RDirect { Prop = "http://fogid.net/o/location-place" }
+                        } } },
+@*9*@ new RInverse { Prop = "http://fogid.net/o/in-org", IRec = new RRecord { Props = new RProperty[]
+                        {
+                            new RField { Prop = "http://fogid.net/o/from-date" },
+                            new RField { Prop = "http://fogid.net/o/role-classification" },
+                            new RField { Prop = "http://fogid.net/o/role" },
+                            new RDirect { Prop = "http://fogid.net/o/participant" }
+                        }  } },
+@*10*@ new RInverse { Prop = "http://fogid.net/o/inDocument", IRec = new RRecord { Props = new RProperty[]
+                        {
+                            new RField { Prop = "http://fogid.net/o/pageNumbers" },
+                            new RDirect { Prop = "http://fogid.net/o/partItem"  }
+                        }  } },
+@*11*@ new RInverse { Prop = "http://fogid.net/o/in-doc", IRec = new RRecord { Props = new RProperty[]
+                        {
+                            new RField { Prop = "http://fogid.net/o/ground" },
+                            new RDirect { Prop = "http://fogid.net/o/reflected" }
+                        }  } },
+
+                                                }
+        };
+
 }

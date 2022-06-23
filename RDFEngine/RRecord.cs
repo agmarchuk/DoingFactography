@@ -31,6 +31,10 @@ namespace RDFEngine
         {
             return ((RField)this.Props.FirstOrDefault(p => p is RField && p.Prop == propName))?.Value;
         }
+        public string GetField(int propind)
+        {
+            return ((RField)this.Props[propind])?.Value;
+        }
         public string GetDirectResource(string propName)
         {
             var prop = this.Props.FirstOrDefault(p => p.Prop == propName);
@@ -47,6 +51,21 @@ namespace RDFEngine
             if (prop is RDirect) return ((RDirect)prop).DRec;
             return null;
         }
+        public RRecord GetDirect(int propind)
+        {
+            var prop = Props[propind];
+            if (prop == null) return null;
+            if (prop is RDirect) return ((RDirect)prop).DRec;
+            return null;
+        }
+        public RRecord[] GetMultiInverse(int propind)
+        {
+            var prop = Props[propind];
+            if (prop == null) return null;
+            if (prop is RMultiInverse) return ((RMultiInverse)prop).IRecs;
+            return null;
+        }
+
         public string GetName()
         {
             return ((RField)this.Props.FirstOrDefault(p => p is RField && p.Prop == REngine.propName))?.Value;
@@ -116,6 +135,12 @@ namespace RDFEngine
     public class RInverse : RProperty
     {
         public RRecord IRec { get; set; }
+    }
+
+    // Еще более новое расширение
+    public class RMultiInverse : RProperty
+    {
+        public RRecord[] IRecs { get; set; }
     }
 
     // Специальное расширение для описателей перечислимых  

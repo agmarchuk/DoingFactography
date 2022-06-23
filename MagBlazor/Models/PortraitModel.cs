@@ -1,10 +1,78 @@
 using System.Collections.Generic;
 using System.Linq;
+using MagBlazor;
 using RDFEngine;
 
 namespace MagBlazor.Models
 {
-    public class PortraitModel4
+    public class PortraitModel5
+    {
+        /// <summary>
+        /// Ключевое преобразование идентификатора сущности в расширенную запись Multi-формата
+        /// </summary>
+        /// <param name="id">Идентификатор записи извлекаемой из базы данных, состоящая из одного уровня RField, RLink, RInverseLink </param>
+        /// <param name="template">template является деревом элементов RRecord, RField, RDirect, RInverse</param>
+        /// <returns>Запись, выявляемая по идентификатору id либо нек</returns>
+        public static RRecord BuildMultiTree(string id, RRecord template)
+        {
+            if (id == null) return null;
+            if (template == null) return (new RXEngine()).GetRRecord(id);
+            bool extended = template.Props.Any(p => p is RInverse);
+            RRecord erec = (new RXEngine()).GetRRecord(id, extended);
+            RProperty[] props = new RProperty[template.Props.Length];
+            for (int i = 0; i < template.Props.Length; i++)
+            {
+                RProperty frm = template.Props[i];
+                string prop_id = frm.Prop;
+                if (frm is RField)
+                {
+                    RField f = new RField { Prop = prop_id, Value = erec.GetField(prop_id), Lang = null };
+                    props[i] = f;
+                }
+                else if (frm is RDirect)
+                {
+                    var lnk = erec.GetDirectResource(prop_id);
+                    RDirect dir = new RDirect { Prop = prop_id, DRec = BuildMultiTree(lnk, ((RDirect)frm).DRec) };
+                    props[i] = dir;
+                }
+                else if (frm is RInverse)
+                {
+                    var inv_set = erec.Props.Where(p => p is RInverseLink && p.Prop == prop_id).ToArray();
+                    props[i] = new RMultiInverse
+                    {
+                        Prop = prop_id,
+                        IRecs = inv_set.Cast<RInverseLink>()
+                        .Select(inv =>
+                        {
+                            RRecord irec = null;
+                            if (inv.Source != null && ((RInverse)frm).IRec != null)
+                            {
+                                irec = BuildMultiTree(inv.Source, ((RInverse)frm).IRec);
+                            }
+                            else if (inv.Source != null && ((RInverse)frm).IRec == null)
+                            {
+                                var r = (new RXEngine()).GetRRecord(inv.Source);
+                                irec = new RRecord
+                                {
+                                    Id = r.Id,
+                                    Tp = r.Tp,
+                                    Props =
+                                    r.Props.Where(p => !(p is RLink && p.Prop == prop_id)).ToArray()
+                                };
+                            }
+
+                            return irec;
+                        }).ToArray()
+                    };
+                }
+            }
+            RRecord tree = new RRecord { Id = erec.Id, Tp = erec.Tp, Props = props };
+            return tree;
+        }
+    }
+
+}
+public class PortraitModel4
     {
         public string Id, Tp, tp, name, fd, td, description, uri, doccontent;
         public string dates { get { return (fd == null ? "" : fd) + (string.IsNullOrEmpty(td) ? "" : "-" + td); } }
@@ -245,110 +313,110 @@ namespace MagBlazor.Models
             return tree;
         }
     }
-    public class PortraitModel3
-    {
-        public string name, fd, td, description, uri;
-        public string dates { get { return (fd == null ? "" : fd) + (string.IsNullOrEmpty(td) ? "" : "-" + td); } }
-        public RRecord[] titles = null;
-        public RRecord[] works = null;
-        public RRecord[] notworks = null;
-        public RRecord[] livings = null;
+    //public class PortraitModel3
+    //{
+    //    public string name, fd, td, description, uri;
+    //    public string dates { get { return (fd == null ? "" : fd) + (string.IsNullOrEmpty(td) ? "" : "-" + td); } }
+    //    public RRecord[] titles = null;
+    //    public RRecord[] works = null;
+    //    public RRecord[] notworks = null;
+    //    public RRecord[] livings = null;
 
-        private PM3 m3;
-        public PortraitModel3(RRecord rec)
-        {
-            m3 = new PM3(rec);
-            name = m3.focusRec.GetName();
-            fd = m3.focusRec.GetField("http://fogid.net/o/from-date");
-            td = m3.focusRec.GetField("http://fogid.net/o/to-date");
-            description = m3.focusRec.GetField("http://fogid.net/o/description");
-            foreach (var qq in m3.focusInversePropTypes)
-            {
-                if (qq.Prop == "http://fogid.net/o/titled")
-                {
-                    titles = qq.lists.SelectMany(l => l.list).ToArray();
-                }
-            }
-        }
-    }
+    //    private PM3 m3;
+    //    public PortraitModel3(RRecord rec)
+    //    {
+    //        m3 = new PM3(rec);
+    //        name = m3.focusRec.GetName();
+    //        fd = m3.focusRec.GetField("http://fogid.net/o/from-date");
+    //        td = m3.focusRec.GetField("http://fogid.net/o/to-date");
+    //        description = m3.focusRec.GetField("http://fogid.net/o/description");
+    //        foreach (var qq in m3.focusInversePropTypes)
+    //        {
+    //            if (qq.Prop == "http://fogid.net/o/titled")
+    //            {
+    //                titles = qq.lists.SelectMany(l => l.list).ToArray();
+    //            }
+    //        }
+    //    }
+    //}
 
-    public class PM3
-    { 
-        public RRecord focusRec = null;
-        public Models.InversePropType[] focusInversePropTypes = null;
+    //public class PM3
+    //{ 
+    //    public RRecord focusRec = null;
+    //    public Models.InversePropType[] focusInversePropTypes = null;
         
-        public PM3(RRecord rec)
-        {
-            RRecord erec = (new RDFEngine.RXEngine()).GetRRecord(rec.Id, true);
-            var query = erec.Props.Where(p => p is RInverseLink)
-                .Cast<RInverseLink>() 
-                .Select(ril => new RInverse { Prop = ril.Prop, IRec = (new RXEngine()).GetRRecord(ril.Source) })
-                .Cast<RInverse>()
-                .GroupBy(d => d.Prop)
-                .Select(kd => new Models.InversePropType
-                {
-                    Prop = kd.Key,
-                    lists =
-                    kd.GroupBy(d => d.IRec.Tp)
-                        .Select(dd =>
-                        {
-                            var qu = dd.Select(x => x.IRec)
-                                .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = Infobase.rontology.ReorderFieldsDirects(rr, "ru") })
-                                .ToArray();
-                            return new Models.InverseType
-                            {
-                                Tp = dd.Key,
-                                list = qu
-                            };
-                        }).ToArray()
-                }).ToArray();
-            focusInversePropTypes = query;
-            focusRec = new RRecord { Id = erec.Id, Tp = erec.Tp, Props = Infobase.rontology.ReorderFieldsDirects(erec, "ru") };
-        }
-    }
-    public class PortraitModel2
-    {
-        public P3Model p3m;
-        public string name, fd, td, description, uri;
-        public string dates { get { return (fd == null ? "" : fd) + (string.IsNullOrEmpty(td) ? "" : "-" + td); } }
-        public RRecord[] titles = null;
-        public RRecord[] works = null;
-        public RRecord[] notworks = null;
-        public RRecord[] livings = null;
+    //    public PM3(RRecord rec)
+    //    {
+    //        RRecord erec = (new RDFEngine.RXEngine()).GetRRecord(rec.Id, true);
+    //        var query = erec.Props.Where(p => p is RInverseLink)
+    //            .Cast<RInverseLink>() 
+    //            .Select(ril => new RInverse { Prop = ril.Prop, IRec = (new RXEngine()).GetRRecord(ril.Source) })
+    //            .Cast<RInverse>()
+    //            .GroupBy(d => d.Prop)
+    //            .Select(kd => new Models.InversePropType
+    //            {
+    //                Prop = kd.Key,
+    //                lists =
+    //                kd.GroupBy(d => d.IRec.Tp)
+    //                    .Select(dd =>
+    //                    {
+    //                        var qu = dd.Select(x => x.IRec)
+    //                            .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = Infobase.rontology.ReorderFieldsDirects(rr, "ru") })
+    //                            .ToArray();
+    //                        return new Models.InverseType
+    //                        {
+    //                            Tp = dd.Key,
+    //                            list = qu
+    //                        };
+    //                    }).ToArray()
+    //            }).ToArray();
+    //        focusInversePropTypes = query;
+    //        focusRec = new RRecord { Id = erec.Id, Tp = erec.Tp, Props = Infobase.rontology.ReorderFieldsDirects(erec, "ru") };
+    //    }
+    //}
+    //public class PortraitModel2
+    //{
+    //    public P3Model p3m;
+    //    public string name, fd, td, description, uri;
+    //    public string dates { get { return (fd == null ? "" : fd) + (string.IsNullOrEmpty(td) ? "" : "-" + td); } }
+    //    public RRecord[] titles = null;
+    //    public RRecord[] works = null;
+    //    public RRecord[] notworks = null;
+    //    public RRecord[] livings = null;
 
-        public PortraitModel2(RRecord rec)
-        {
-            // Вычислим обратные ссылки через расширенную запись
-            RRecord erec = (new RDFEngine.RXEngine() { User = null }).GetRRecord(rec.Id, true);
-            List<string> tit_ids = new List<string>();
-            List<string> part_ids = new List<string>();
-            List<string> liv_ids = new List<string>();
+    //    public PortraitModel2(RRecord rec)
+    //    {
+    //        // Вычислим обратные ссылки через расширенную запись
+    //        RRecord erec = (new RDFEngine.RXEngine() { User = null }).GetRRecord(rec.Id, true);
+    //        List<string> tit_ids = new List<string>();
+    //        List<string> part_ids = new List<string>();
+    //        List<string> liv_ids = new List<string>();
 
-            foreach (RProperty rprop in erec.Props)
-            {
-                if (rprop is RField)
-                {
-                    RField f = (RField)rprop;
-                    if (f.Prop == "http://fogid.net/o/name") name = f.Value; //TODO: предусмотреть множественность
-                    else if (f.Prop == "http://fogid.net/o/from-date") fd = f.Value;
-                    else if (f.Prop == "http://fogid.net/o/to-date") td = f.Value;
-                    else if (f.Prop == "http://fogid.net/o/description") description = f.Value;
-                    else if (f.Prop == "http://fogid.net/o/uri") uri = f.Value;
-                }
-                else if (rprop is RLink)
-                {
-                }
-                else if (rprop is RInverseLink)
-                {
-                    RInverseLink l = (RInverseLink)rprop;
-                    if (l.Prop == "http://fogid.net/o/has-title") tit_ids.Add(l.Source);
-                    else if (l.Prop == "http://fogid.net/o/participant") part_ids.Add(l.Source);
-                    else if (l.Prop == "http://fogid.net/o/something") liv_ids.Add(l.Source);
-                }
-                //if (tit_ids.Count > 0) titles = tit_ids.Select(t => )
-            }
-        }
-    }
+    //        foreach (RProperty rprop in erec.Props)
+    //        {
+    //            if (rprop is RField)
+    //            {
+    //                RField f = (RField)rprop;
+    //                if (f.Prop == "http://fogid.net/o/name") name = f.Value; //TODO: предусмотреть множественность
+    //                else if (f.Prop == "http://fogid.net/o/from-date") fd = f.Value;
+    //                else if (f.Prop == "http://fogid.net/o/to-date") td = f.Value;
+    //                else if (f.Prop == "http://fogid.net/o/description") description = f.Value;
+    //                else if (f.Prop == "http://fogid.net/o/uri") uri = f.Value;
+    //            }
+    //            else if (rprop is RLink)
+    //            {
+    //            }
+    //            else if (rprop is RInverseLink)
+    //            {
+    //                RInverseLink l = (RInverseLink)rprop;
+    //                if (l.Prop == "http://fogid.net/o/has-title") tit_ids.Add(l.Source);
+    //                else if (l.Prop == "http://fogid.net/o/participant") part_ids.Add(l.Source);
+    //                else if (l.Prop == "http://fogid.net/o/something") liv_ids.Add(l.Source);
+    //            }
+    //            //if (tit_ids.Count > 0) titles = tit_ids.Select(t => )
+    //        }
+    //    }
+    //}
     public class PortraitModel
     {
         public string name, dates, description;
@@ -449,4 +517,4 @@ namespace MagBlazor.Models
 
         }
     }
-}
+
