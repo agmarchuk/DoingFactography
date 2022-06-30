@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<config>
-	<database dbname="photoarchive" connectionstring="xml:" />
-
-	<LoadCassette>D:\Home\FactographProjects\Cassette_20211014</LoadCassette>
-	<LoadCassette write="yes">D:\Home\FactographProjects\Cassette_test20180311</LoadCassette>
-
-</config>

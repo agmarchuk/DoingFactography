@@ -12,6 +12,11 @@ namespace MagBlazor.Controllers
         public IActionResult GetImage(string u, string s)
         {
             string path = OAData.OADB.GetFilePath(u, s);
+            if (!System.IO.File.Exists(path + ".jpg"))
+            {
+                s = s == "medium" ? "normal" : "medium";
+                path = OAData.OADB.GetFilePath(u, s);
+            }
             return PhysicalFile(path + ".jpg", "image/jpg");
         }
 

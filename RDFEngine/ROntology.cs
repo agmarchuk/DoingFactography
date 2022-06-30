@@ -113,10 +113,32 @@ namespace RDFEngine
         /// 
         /// </summary>
         private Dictionary<string, string[]> dicsInversePropsForType = null;
+        private Dictionary<string, string[]> dicsDirectPropsForType = null;
+        
         public IEnumerable<string> GetInversePropsByType(string tp) 
         {
             return dicsInversePropsForType[tp];
                 //.Select(ps => )
+        }
+        public int PropsTotal(string tp)
+        {
+            int n1 = dicsDirectPropsForType[tp].Length;
+            int n2 = dicsInversePropsForType[tp].Length;
+            return n1 + n2;
+        }
+        public int PropPosition(string tp, string prop, bool isinverse)
+        {
+            var d1 = dicsDirectPropsForType[tp];
+            int n1 = d1.Length;
+            if (isinverse) d1 = dicsInversePropsForType[tp];
+            int i = 0;
+            for (; i<d1.Length; i++)
+            {
+                if (d1[i] == prop) break;
+            }
+            if (i == d1.Length) return -1;
+            if (isinverse) i += n1;
+            return i;
         }
 
         // Словарь родителей с именами родителей.
@@ -315,7 +337,18 @@ namespace RDFEngine
                 .GroupBy(typr => typr.ty)
                 .ToDictionary(keypair => keypair.Key, keypair => keypair.Select(x => x.pr_id).Distinct().ToArray());
 
+            // Для каждого типа создадим по 2 словаря, а потом объединим их под общим словарем
+            dicsDirectPropsForType = //null;
+                rontology.Where(rr => rr.Tp == "ObjectProperty" || rr.Tp == "DatatypeProperty")
+                .SelectMany(rr => rr.Props
+                    .Where(p => p is RLink && p.Prop == "domain")
+                    .Select(p => new { pr = rr.Id, tp = ((RLink)p).Resource }))
+                .SelectMany(pa => DescendantsAndSelf(pa.tp).Select(t => new { ty = t, pr_id = pa.pr }))
+                .GroupBy(typr => typr.ty)
+                .ToDictionary(keypair => keypair.Key, keypair => keypair.Select(x => x.pr_id).Distinct().ToArray());
+            // ОПределение функции. 
         }
+
         // Использование константно заданной онтологии sampleontology
         //public ROntology() : this(samplerontology) { }
 
@@ -367,8 +400,8 @@ namespace RDFEngine
                         }
                         else // Иначе есть два варианта: всепобеждающий lang и английский
                         {
-                            if (((RField)res_arr[n]).Lang == lang) { }
-                            else if (f.Lang == lang) 
+                            if ((((RField)res_arr[n]).Lang??"ru") == lang) { }
+                            else if ((f.Lang ?? "ru") == lang) 
                             {
                                 ((RField)res_arr[n]).Value = f.Value;
                                 ((RField)res_arr[n]).Lang = f.Lang;
@@ -416,6 +449,7 @@ namespace RDFEngine
         }
         public string LabelOfOnto(string id)
         {
+            if (string.IsNullOrEmpty(id) || !dicOnto.ContainsKey(id)) return null;
             int nom = dicOnto[id];
             return rontology[nom].Props
                 .Where(p => p is RField)

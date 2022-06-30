@@ -1,0 +1,486 @@
+﻿@using RDFEngine
+@using MagBlazor.Models;
+
+@if (m == null) { return; }
+
+<p class="grad">
+    <a href="view" class="nov"><img src="images/ico-home.gif" class="ico-home" alt="" />Электронный архив</a>
+    &raquo;
+    @(m.GetLabel(m.Tp))
+    &raquo;
+    @m.GetName()
+</p>
+
+
+<div class="heading1">
+    <h1>
+        @m.GetName()
+        <span style="font-size:smaller;">@m.GetDates()</span>
+    </h1>
+</div>
+@if (externalId != null)
+    {
+        string pr = "/view/" + prev + "/" + externalId;
+        string d = "/view/" + externalId;
+        string nx = "/view/" + next + "/" + externalId;
+        <div style="text-align: center;">
+            <NavLink href="@d">к документу</NavLink>
+            &nbsp;
+            @if (prev == null)
+            {
+                <span>пред.</span>
+            }
+            else
+            {
+                <NavLink href="@pr"><span>пред.</span></NavLink>
+            }
+            &nbsp;
+            @if (next == null)
+            {
+                <span>след.</span>
+            }
+            else
+            {
+                <NavLink href="@nx"><span>след.</span></NavLink>
+            }
+        </div>
+    }
+@{ 
+    string uri = m.GetField("http://fogid.net/o/uri");
+}
+@if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/photo-doc")
+    {
+        string sr = "/Docs/GetImage?u=" + uri + "&s=medium";
+        <div style="text-align: center;">
+            <img src="@sr" />
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
+    {
+        string sr = "/Docs/GetVideo?u=" + uri;
+        <div style="text-align: center;">
+            <video src="@sr" />
+        </div>
+    }
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-person">
+    <tr><th width="25%">&nbsp;</th><th></th></tr>
+    @{
+        var namings = m.GetMultiInverse("http://fogid.net/o/referred-sys");
+    }
+    @if (namings.Length > 0)
+    {
+        <tr valign="top">
+            <td class="line-name">Другие имена:</td>
+            <td class="line-info">
+                @foreach (var naming in namings)
+                {
+                    string alias = naming.GetField("http://fogid.net/o/alias");
+                    string dates = naming.GetDates();
+                    <span>@dates &nbsp; @alias</span><br />
+                }
+            </td>
+        </tr>
+    }
+    @{
+        var datings = m.GetMultiInverse("http://fogid.net/o/referred");
+    }
+    @if (datings.Length > 0)
+    {
+        <tr valign="top">
+            <td class="line-name">Другие даты:</td>
+            <td class="line-info">
+                @foreach (var dating in datings)
+                {
+                    string date = dating.GetField("http://fogid.net/o/date");
+                    string dspec = dating.GetField("http://fogid.net/o/dating-specificator");
+                    string ds = Infobase.rontology.EnumValue("http://fogid.net/o/dating-specificator", dspec, "ru");
+                    string accuracy = dating.GetField("http://fogid.net/o/dating-accuracy");
+                    <span>@date &nbsp; @ds  &nbsp; @accuracy</span><br />
+                }
+            </td>
+        </tr>
+    }
+    @{
+        var titled = m.GetMultiInverse("http://fogid.net/o/has-title");
+    }
+    @if (titled.Length > 0)
+    {
+        <tr valign="top">
+            <td class="line-name">Титулы и награды:</td>
+            <td class="line-info">
+                @foreach (var tit in titled)
+                {
+                    string degree = tit.GetField("http://fogid.net/o/degree");
+                    string dates = tit.GetDates();
+                    <span>@dates &nbsp; @degree</span><br />
+                }
+            </td>
+        </tr>
+    }
+    @{
+        string description = m.GetField("http://fogid.net/o/description");
+    }
+    @if (!string.IsNullOrEmpty(description))
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Описание документа:</td>
+            <td width="75%" class="line-info">@description</td>
+        </tr>
+    }
+    @{ RRecord[] indoc_parts = m.GetMultiInverse("http://fogid.net/o/inDocument"); }
+    @if (indoc_parts != null && indoc_parts.Count() > 0)
+    {
+        <tr valign="top">
+            <td class="doc-show-small">&nbsp;</td>
+            <td class="doc-show-small">
+                @foreach (var docpart in indoc_parts)
+                {
+                    RRecord pitem = docpart.GetDirect("http://fogid.net/o/partItem");
+                    string nm = pitem.GetName();
+                    uri = pitem.GetField("http://fogid.net/o/uri");
+
+                    if (uri != null && uri.StartsWith("iiss://"))
+                    {
+                        string sr = "/Docs/GetImage?u=" + uri + "&s=small";
+                        string lnk = "/view/" + pitem.Id + "/" + m.Id;
+                        <div class="show-small">
+                            <NavLink href="@lnk">
+                                <img src="@sr" border="0" vspace="10" hspace="10" alt="" />
+                            </NavLink>
+                            <br />
+                            @docpart.GetField("http://fogid.net/o/pageNumbers")
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="show-small">
+                            <a href="@uri">
+                                <img src="/images/photo.jpg" />
+                            </a>
+                            <br />
+                            @docpart.GetField("http://fogid.net/o/pageNumbers")
+                        </div>
+                    }
+                }
+            </td>
+        </tr>
+    }
+    @{ string doccontent = m.GetField("http://fogid.net/o/doc-content"); }
+    @if (!string.IsNullOrEmpty(doccontent))
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Текст документа:</td>
+            <td width="75%" class="line-info">@doccontent</td>
+        </tr>
+    }
+    @{
+        var adoc_authorities = m.GetMultiInverse("http://fogid.net/o/adoc");
+    }
+    @if (adoc_authorities.Length > 0)
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Автор(ы) документа:</td>
+            <td width="75%" class="line-info">
+                @foreach (var refle in adoc_authorities.Where(re => re != null))
+                {
+                    RRecord who = refle.GetDirect("http://fogid.net/o/author");
+                    string lnk = "/view/" + who.Id;
+                    <NavLink href='@lnk'>@who.GetName()</NavLink>;
+                }
+            </td>
+        </tr>
+    }
+    @{
+        RRecord[] indoc_reflections = m.GetMultiInverse("http://fogid.net/o/in-doc");
+    }
+    @if (indoc_reflections != null && indoc_reflections.Count() > 0)
+    {
+        string se = "";
+        <tr valign="top">
+            <td width="25%" class="line-name">Отраженные персонажи:</td>
+            <td width="75%" class="line-info">
+                @foreach (var refle in indoc_reflections.Where(re => re != null))
+                {
+                    RRecord who = refle.GetDirect("http://fogid.net/o/reflected");
+                    string lnk = "/view/" + who.Id;
+                    @se; se = ", "; <NavLink href='@lnk'>@who.GetName()</NavLink>;
+                }
+            </td>
+        </tr>
+    }
+    @{
+        RRecord[] incoll_member = m.GetMultiInverse("http://fogid.net/o/in-collection");
+        RRecord[] incoll_member_photos = incoll_member
+            .Where(r => r.GetDirect("http://fogid.net/o/collection-item").Tp == "http://fogid.net/o/photo-doc").ToArray();
+        RRecord[] incoll_member_rest = incoll_member
+            .Where(r => r.GetDirect("http://fogid.net/o/collection-item").Tp != "http://fogid.net/o/photo-doc").ToArray();
+    }
+    @if (incoll_member_photos != null && incoll_member_photos.Count() > 0)
+    {
+        <tr valign="top">
+            <td class="line-name">Фотографии коллекции</td>
+            <td class="line-info">
+                <div>
+                    @foreach (var member in incoll_member_photos)
+                    {
+                        RRecord elem = member.GetDirect("http://fogid.net/o/collection-item");
+                        string lnk = "/view/" + elem.Id;
+                        string ur = "/docs/GetImage?s=small&u=" + elem.GetField("http://fogid.net/o/uri");
+                        <NavLink href='@lnk'> <img src="@ur" /> </NavLink>
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+    @if (incoll_member_rest != null && incoll_member_rest.Count() > 0)
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Элементы коллекции:</td>
+            <td width="75%" class="line-info">
+                @foreach (var member in incoll_member_rest)
+                {
+                    RRecord elem = member.GetDirect("http://fogid.net/o/collection-item");
+                    string lnk = "/view/" + elem.Id;
+                    <NavLink href='@lnk'>@elem.GetName()</NavLink> <br />
+                }
+            </td>
+        </tr>
+    }
+    @{
+        RRecord[] item_member = m.GetMultiInverse("http://fogid.net/o/collection-item");
+    }
+    @if (item_member != null && item_member.Count() > 0)
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Является элементом в коллекциях:</td>
+            <td width="75%" class="line-info">
+                @foreach (var member in item_member)
+                {
+                    RRecord coll = member.GetDirect("http://fogid.net/o/in-collection");
+                    string lnk = "/view/" + coll.Id;
+                    <NavLink href='@lnk'>@coll.GetName()</NavLink> <br />
+                }
+            </td>
+        </tr>
+    }
+
+    @{
+        var particips = m.GetMultiInverse("http://fogid.net/o/participant");
+        if (particips.Count() > 0)
+        {
+            string sep = "";
+            <tr valign="top">
+                <td width="25%" class="line-name">Участие:</td>
+                <td width="75%" class="line-info">
+                    @{
+                        @foreach (var participation in particips)
+                        {
+                            RRecord where = participation.GetDirect("http://fogid.net/o/in-org");
+                            string lnk = "/view/" + where.Id;
+                            @sep; sep = ", "; <NavLink href='@lnk'>@where.GetName()</NavLink>;
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    }
+    @{
+        var participants = m.GetMultiInverse("http://fogid.net/o/in-org");
+        if (participants.Count() > 0)
+        {
+            string sep = "";
+            <tr valign="top">
+                <td width="25%" class="line-name">Участники:</td>
+                <td width="75%" class="line-info">
+                    @{
+                        @foreach (var participation in participants)
+                        {
+                            RRecord who = participation.GetDirect("http://fogid.net/o/participant");
+                            string lnk = "/view/" + who.Id;
+                            @sep; sep = ", "; <NavLink href='@lnk'>@who.GetName()</NavLink>;
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    }
+
+    @{
+        var child_relatives = m.GetMultiInverse("http://fogid.net/o/org-child");
+        if (child_relatives.Count() > 0)
+        {
+            string sep = "";
+            <tr valign="top">
+                <td width="25%" class="line-name">Входит в орг. системы:</td>
+                <td width="75%" class="line-info">
+                    @{
+                        @foreach (var relatives in child_relatives)
+                        {
+                            RRecord parent = relatives.GetDirect("http://fogid.net/o/org-parent");
+                            string lnk = "/view/" + parent.Id;
+                            @sep; sep = ", "; <NavLink href='@lnk'>@parent.GetName()</NavLink>;
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    }
+    @{
+        var parent_relatives = m.GetMultiInverse("http://fogid.net/o/org-parent");
+        if (parent_relatives.Count() > 0)
+        {
+            string sep = "";
+            <tr valign="top">
+                <td width="25%" class="line-name">Состоит из орг. систем:</td>
+                <td width="75%" class="line-info">
+                    @{
+                        @foreach (var relatives in parent_relatives)
+                        {
+                            RRecord child = relatives.GetDirect("http://fogid.net/o/org-child");
+                            string lnk = "/view/" + child.Id;
+                            @sep; sep = ", "; <NavLink href='@lnk'>@child.GetName()</NavLink>;
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    }
+
+</table>
+
+@{
+    var authorities = m.GetMultiInverse("http://fogid.net/o/author");
+    if (authorities.Count() > 0)
+    {
+        <div class="heading3">
+            <h3>Является автором/получателем документов</h3>
+        </div>
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-docs">
+            <tr>
+                <th width="15%"><a href="sort">Дата</a></th>
+                <th width="65%" class="th-document-name"><a href="sort">Название документа<img src="img/ico-sort-down.gif" alt="" /></a></th>
+                <th width="20%"><a href="sort">автор/получатель</a></th>
+            </tr>
+            @foreach (var authority in authorities)
+            {
+                RRecord doc = authority.GetDirect("http://fogid.net/o/adoc");
+                string dt = doc.GetField("http://fogid.net/o/from-date");
+                string lnk = "/view/" + doc.Id;
+                string asp = authority.GetField("http://fogid.net/o/authority-specificator");
+                string val = Infobase.rontology.EnumValue("http://fogid.net/o/authority-specificator", asp, "ru");
+                <tr valign="top">
+                    <td width="15%">@dt</td>
+                    <td width="65%">
+                        <a href='@lnk'>&quot;@(doc.GetName())&quot;</a><br />
+                        <span class="small"></span>
+                    </td>
+                    <td width="20%">
+                        @(val)
+                    </td>
+                </tr>
+            }
+        </table>
+        <br />
+    }
+    var reflections = m.GetMultiInverse("http://fogid.net/o/reflected");
+    var refl_photos = reflections.Where(re => re.GetDirect("http://fogid.net/o/in-doc").Tp == "http://fogid.net/o/photo-doc").ToArray();
+    var refl_rest = reflections.Where(re => re.GetDirect("http://fogid.net/o/in-doc").Tp != "http://fogid.net/o/photo-doc").ToArray();
+    if (refl_photos.Count() > 0)
+    {
+        <div class="heading3">
+            <h3>Отражен в фотографиях</h3>
+        </div>
+        <div>
+            @foreach (var reflection in reflections)
+            {
+                RRecord doc = reflection.GetDirect("http://fogid.net/o/in-doc");
+                string dt = doc.GetField("http://fogid.net/o/from-date");
+                uri = doc.GetField("http://fogid.net/o/uri");
+                string lnk = "/view/" + doc.Id;
+                string sr = "/Docs/GetImage?s=small&u=" + uri;
+                <a href="@lnk"> <img src='@sr' /> </a>
+            }
+        </div>
+        <br />
+    }
+    if (refl_rest.Count() > 0)
+    {
+        <div class="heading3">
+            <h3>Отражен в документах</h3>
+        </div>
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-docs">
+            <tr>
+                <th width="20%"><a href="sort">Дата</a></th>
+                <th width="80%" class="th-document-name"><a href="sort">Название документа<img src="img/ico-sort-down.gif" alt="" /></a></th>
+            </tr>
+            @foreach (var reflection in refl_rest)
+            {
+                RRecord doc = reflection.GetDirect("http://fogid.net/o/in-doc");
+                string dt = doc.GetField("http://fogid.net/o/from-date");
+                string lnk = "/view/" + doc.Id;
+                string descr = doc.GetField("http://fogid.net/o/description");
+                <tr valign="top">
+                    <td>@dt</td>
+                    <td>
+                        <a href='@lnk'>@(doc.GetName())</a><br />
+                        <span class="small">@descr</span>
+                    </td>
+                </tr>
+            }
+        </table>
+        <br />
+    }
+}
+
+@code {
+    [Parameter]
+    public RRecord focusrecord { get; set; }
+
+    [Parameter]
+    public string externalId { get; set; }
+
+    private RRecordTree m = null;
+
+    protected override void OnParametersSet() // = On Page Load
+    {
+        Build();
+    }
+    private string look;
+    private string prev = null, next = null;
+    private void Build()
+    {
+        if (focusrecord != null)
+        {
+            m = new RRecordTree(focusrecord.Id, Infobase.rontology);
+            if (externalId != null)
+            {
+                RRecord externalRec = (new RXEngine()).GetRRecord(externalId, true);
+                var rxobj = new RXEngine();
+                var docset = externalRec.Props
+                    .Where(p => p is RLink && p.Prop == "http://fogid.net/o/inDocument").Cast<RLink>()
+                    .Select(l =>
+                    {
+                        RRecord r = rxobj.GetRRecord(l.Resource, false);
+                        return new { r = r, pg = r.GetField("http://fogid.net/o/pageNumbers") };
+                    })
+                    .OrderBy(rpg => rpg.pg)
+                    .Select(rpg => rpg.r.GetDirectResource("http://fogid.net/o/partItem"))
+                    .ToArray();
+                int ind = Array.IndexOf(docset, externalId);
+                if (ind != -1 && ind - 1 >= 0)
+                {
+                    prev = docset[ind - 1];
+                }
+                if (ind != -1 && ind + 1 < docset.Length)
+                {
+                    next = docset[ind + 1];
+                }
+
+
+
+            }
+        }
+    }
+
+}

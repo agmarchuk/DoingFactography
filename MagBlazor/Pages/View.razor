@@ -11,7 +11,7 @@
 
 <MagBlazor.Components.ViewSearch onSelected="@((rid) => UtilizeRecord((string)rid))" searchsample="@searchsample" typs="@tps" user="@user" />
 
-<MagBlazor.Components.ViewPortrait focusrecord="@focusrecord" externalId="@eid" />
+<MagBlazor.Components.ViewPortrait2 focusrecord="@focusrecord" externalId="@eid" />
 
 @code {
     [Parameter]
@@ -26,7 +26,9 @@
         "http://fogid.net/o/person",
         "http://fogid.net/o/org-sys",
         "http://fogid.net/o/document",
-        "http://fogid.net/o/collection"
+        "http://fogid.net/o/collection",
+        "http://fogid.net/o/photo-doc",
+        "http://fogid.net/o/video-doc",
             //"http://fogid.net/o/",
         };
     private string user = null;

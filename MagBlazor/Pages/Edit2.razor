@@ -1,0 +1,127 @@
+﻿@page "/edit2/{entityId?}"
+@using RDFEngine
+@using MagBlazor
+
+<h3>Edit2 @entityId</h3>
+<div>@(focusTree.Tp)</div>
+<table border="1">
+    <tr>
+        @foreach (var p in focusTree.Props)
+        {
+            <td>@(focusTree.GetLabel(p?.Prop))</td>
+        }
+    </tr>
+    <tr>
+        @foreach (var p in focusTree.Props)
+        {
+            if (p is RField)
+            {
+                RField f = (RField)p;
+                <td>@(f?.Value)</td>
+            }
+            else if (p is RDirect)
+            {
+                RDirect rd = (RDirect)p;
+                string lnk = "/edit2/" + rd.DRec.Id;
+                <td><NavLink href="@lnk">@(rd.DRec.GetName())</NavLink> </td>
+            }
+            else if (p is RMultiInverse)
+            {
+                RMultiInverse rm = (RMultiInverse)p;
+                <td>@(rm.IRecs.Length)</td>
+            }
+            else
+            {
+                string val = p == null ? null : "???";
+                <td>@val</td>
+            }
+        }
+    </tr>
+</table>
+<table border="1">
+    <tr>
+        <td>@focusTree.GetName()</td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+
+@code {
+    [Parameter]
+    public string entityId { get; set; }
+
+    //private RRecord focusRec = null;
+    private RRecordTree focusTree = null;
+
+    private void Build(string recId)
+    {
+        // Начинаю строить какую-то модель фокусного узла
+        //RRecord erec = (new RDFEngine.RXEngine()).BuildPortrait(recId);
+        focusTree = new RRecordTree(recId, Infobase.rontology);
+        entityId = recId;
+    }
+    //private RRecord Do(string recId, int level, string forbidden)
+    //{
+    //    // Если level = 0 - только поля, 1 - поля и прямые ссылки,  2 - поля, прямые ссылки и обратные ссылки
+    //    RRecord erec = (new RDFEngine.RXEngine()).GetRRecord(recId, level > 1);
+    //    var tp = erec.Tp;
+
+    //    // В зависимости от типа, узнаем количество прямых и обратных свойств и заводим массив свойств этого размера  
+    //    int nprops = Infobase.rontology.PropsTotal(tp);
+    //    RProperty[] props = new RProperty[nprops];
+
+    //    // Также заводим массив списков RRecord'ов для накопления сгруппированных обратных свойств
+    //    List<RRecord>[] reclists = new List<RRecord>[nprops];
+
+    //    // Сканируем имеющиеся свойства записи и раскладываем их по массиву в соответствии с позицией ind, для обратных свойств пока накапливаем  
+    //    foreach (var p in erec.Props)
+    //    {
+    //        if (p is RLink && p.Prop == forbidden) continue;
+    //        int ind = Infobase.rontology.PropPosition(tp, p.Prop, p is RInverseLink);
+    //        if (p is RField)
+    //        {
+    //            props[ind] = p;
+    //        }
+    //        else if (p is RLink)
+    //        {
+    //            if (level == 0) continue;
+    //            props[ind] = new RDirect { Prop = p.Prop, DRec = Do(((RLink)p).Resource, level - 1, null) };
+    //        }
+    //        else if (p is RInverseLink)
+    //        {
+    //            // накапливаем
+    //            if (level < 2) continue;
+    //            var lnk = (RInverseLink)p;
+    //            RRecord rec = Do(lnk.Source, level - 1, lnk.Prop);
+    //            if (reclists[ind] == null)
+    //            {
+    //                reclists[ind] = new List<RRecord>();
+    //            }
+    //            reclists[ind].Add(rec);
+    //            // В результирующем массиве, сохраняем p для того, чтобы не "потерять" Prop 
+    //            props[ind] = p;
+    //        }
+    //        else
+    //        {
+    //            throw new Exception("Err: 29282");
+    //        }
+    //    }
+
+    //    // Проходим по вспомогатльному массиву и раскладываем обратные накопления  
+    //    for (int i = 0; i < nprops; i++)
+    //    {
+    //        if (reclists[i] == null) continue;
+    //        props[i] = new RMultiInverse { Prop = props[i].Prop, IRecs = reclists[i].ToArray() };
+    //    }
+    //    erec = new RRecord { Id = erec.Id, Tp = erec.Tp, Props = props };
+    //    return erec;
+    //}
+
+    protected override void OnParametersSet()
+    {
+        if (entityId != null)
+        {
+            Build(entityId);
+        }
+    }
+}

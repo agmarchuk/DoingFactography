@@ -46,7 +46,7 @@ namespace RDFEngine
         public RRecord GetDirect(string propName)
         {
             if (propName == null) return null;
-            var prop = this.Props.FirstOrDefault(p => p.Prop == propName);
+            var prop = this.Props.FirstOrDefault(p => p?.Prop == propName);
             if (prop == null) return null;
             if (prop is RDirect) return ((RDirect)prop).DRec;
             return null;
@@ -61,9 +61,9 @@ namespace RDFEngine
         public RRecord[] GetMultiInverse(int propind)
         {
             var prop = Props[propind];
-            if (prop == null) return null;
+            if (prop == null) return new RRecord[0];
             if (prop is RMultiInverse) return ((RMultiInverse)prop).IRecs;
-            return null;
+            return new RRecord[0];
         }
 
         public string GetName()
@@ -118,6 +118,32 @@ namespace RDFEngine
         public int GetHashCode([DisallowNull] RLink obj)
         {
             return obj.Prop.GetHashCode() ^ obj.Resource.GetHashCode();
+        }
+    }
+
+
+    // Custom comparer for the RRecord class
+    public class RRecordComparer : IEqualityComparer<RRecord>
+    {
+        public bool Equals(RRecord x, RRecord y)
+        {
+            //Check whether the compared objects reference the same data.
+            if (Object.ReferenceEquals(x, y)) return true;
+
+            //Check whether any of the compared objects is null.
+            if (Object.ReferenceEquals(x, null) || Object.ReferenceEquals(y, null))
+                return false;
+            return x.Id == y.Id;
+        }
+
+        // If Equals() returns true for a pair of objects
+        // then GetHashCode() must return the same value for these objects.
+
+        public int GetHashCode([DisallowNull] RRecord obj)
+        {
+            //Check whether the object is null
+            if (Object.ReferenceEquals(obj, null)) return 0;
+            return obj.Id.GetHashCode();
         }
     }
 

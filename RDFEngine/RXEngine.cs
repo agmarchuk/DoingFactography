@@ -75,7 +75,7 @@ namespace RDFEngine
                 Props = rec.Props.Select<RProperty, RProperty>(p =>
                 {
                     if (p is RField)
-                        return new RField() { Prop = p.Prop, Value = ((RField)p).Value, Lang = ((RField)p).Lang == null ? "ru" : ((RField)p).Lang };
+                        return new RField() { Prop = p.Prop, Value = ((RField)p).Value, Lang = ((RField)p).Lang == null ? null : ((RField)p).Lang };
                     else if (level > 0 && p is RLink && p.Prop != forbidden)
                         return new RDirect() { Prop = p.Prop, DRec = BuPo(((RLink)p).Resource, 0, null) };
                     else if (level > 1 && p is RInverseLink)

@@ -26,6 +26,8 @@
 
     if (string.IsNullOrEmpty(searchtype)) query = query.Where(r => typs.Contains(r.Tp));
     else query = query.Where(r => r.Tp == searchtype);
+    // Убрать дубли
+    query = query.Distinct(new RRecordComparer());
     if (!extended) { query = query.OrderBy(r => Infobase.GetName(r)); }
     foreach (RRecord rec in query)
     {
