@@ -458,27 +458,26 @@
                 RRecord externalRec = (new RXEngine()).GetRRecord(externalId, true);
                 var rxobj = new RXEngine();
                 var docset = externalRec.Props
-                    .Where(p => p is RLink && p.Prop == "http://fogid.net/o/inDocument").Cast<RLink>()
+                    .Where(p => p is RInverseLink && p.Prop == "http://fogid.net/o/inDocument").Cast<RInverseLink>()
                     .Select(l =>
                     {
-                        RRecord r = rxobj.GetRRecord(l.Resource, false);
+                        RRecord r = rxobj.GetRRecord(l.Source, false);
                         return new { r = r, pg = r.GetField("http://fogid.net/o/pageNumbers") };
                     })
                     .OrderBy(rpg => rpg.pg)
                     .Select(rpg => rpg.r.GetDirectResource("http://fogid.net/o/partItem"))
                     .ToArray();
-                int ind = Array.IndexOf(docset, externalId);
+                int ind = Array.IndexOf(docset, focusrecord.Id);
                 if (ind != -1 && ind - 1 >= 0)
                 {
                     prev = docset[ind - 1];
                 }
+                else prev = null;
                 if (ind != -1 && ind + 1 < docset.Length)
                 {
                     next = docset[ind + 1];
                 }
-
-
-
+                else next = null;
             }
         }
     }

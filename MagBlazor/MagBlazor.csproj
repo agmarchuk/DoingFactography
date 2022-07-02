@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Components\ViewPortrait2.razor" />
     <Content Remove="Components\ViewPortraitOrgsys.razor" />
+    <Content Remove="Components\ViewPortraitPerson.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,10 +35,6 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Components\ViewPortraitOrgsys.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Components\ViewPortraitOrgsys.razor" />
   </ItemGroup>
 
 </Project>

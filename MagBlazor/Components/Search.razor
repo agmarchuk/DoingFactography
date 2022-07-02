@@ -1,8 +1,8 @@
 ﻿@using RDFEngine
 
 <div>
-    <input @bind="searchsample" />
-    <select @bind="searchtype">
+    <input @bind="searchsample"  style="height:24px; margin-top:0px;margin-bottom:10px;"  />
+    <select @bind="searchtype"  style="height:24px; margin-top:0px;margin-bottom:10px;" >
         <option value=""></option>
         @foreach (var typ in typs.Where(t => Infobase.rontology.LabelOfOnto(t) != null)) //TODO: Надо бы более корректно...
         {
