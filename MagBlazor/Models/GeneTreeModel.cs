@@ -8,26 +8,21 @@ namespace MagBlazor.Models
 {
     public class GeneTreeModel
     {
+        public int level;
         public RRecord node;
         public RRecord spouse;
         public GeneTreeModel parent;
         public GeneTreeModel[] childs; 
-    }
-    public class RRecordLevel
-    {
-        public RRecord record;
-        public RRecord spouse;
-        public int level;
 
-        private static IEnumerable<RRecordLevel> Tr(GeneTreeModel model, int level)
+        private static IEnumerable<GeneTreeModel> Tr(GeneTreeModel model, int level)
         {
-            var firstelem = new RRecordLevel { record = model.node, spouse = model.spouse, level = level };
-            var query2 = (new RRecordLevel[] { firstelem })
+            var firstelem = new GeneTreeModel { node = model.node, spouse = model.spouse, level = level };
+            var query2 = (new GeneTreeModel[] { firstelem })
                 .Concat(model.childs.SelectMany(ch => Tr(ch, level + 1)));
             var query3 = query2.ToArray();
             return query3;
         }
-        public static RRecordLevel[] Traverse(GeneTreeModel model)
+        public static GeneTreeModel[] Traverse(GeneTreeModel model)
         {
             return Tr(model, 0).ToArray();
         }

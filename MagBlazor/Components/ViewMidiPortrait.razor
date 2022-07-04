@@ -1,7 +1,50 @@
 ﻿@using RDFEngine;
-<h3>ViewMidiPortrait</h3>
+
+@{ 
+}
+<div style="display:inline-block;">
+    <a href="gene/@(record.Id)"> @(name) </a>
+    @if (!string.IsNullOrEmpty(dates))
+    {
+        <span>&nbsp;[@(dates)]&nbsp;</span>
+    }
+    @if (portrait != null)
+    {
+        <span><img src="/Docs/GetImage/@(uri)" /></span>
+    }
+    @if (title != null)
+    {
+        <span>@(title.GetField("http://fogid.net/o/degree"))</span>
+    }
+</div>
 
 @code {
     [Parameter]
     public RRecord record { get; set; }
+
+    private RRecordTree rtree;
+    private string name;
+    private string dates;
+    private RRecord[] reflections;
+    private RRecord portrait;
+    private string uri;
+    private RRecord[] titles;
+    private RRecord title;
+
+    protected override void OnParametersSet()
+    {
+        rtree = new RRecordTree(record.Id, Infobase.rontology);
+
+        name = rtree.GetName();
+        dates = rtree.GetDates();
+        reflections = rtree.GetMultiInverse("http://fogid.net/o/reflected");
+        portrait = reflections.FirstOrDefault(re => re.GetField("http://fogid.net/o/ground") == "portrait");
+        if (portrait != null) uri = portrait.GetDirect("http://fogid.net/o/in-doc")?.GetField("http://fogid.net/o/uri");
+        titles = rtree.GetMultiInverse("http://fogid.net/o/has-title");
+        title = titles.FirstOrDefault(ti => ti.GetDirect("http://fogid.net/o/support-org") != null);
+        if (title == null && titles.Length > 0)
+        {
+            title = titles.OrderBy(ti => ti.GetField("http://fogid.net/o/from-date")).Last();
+        }
+    }
 }

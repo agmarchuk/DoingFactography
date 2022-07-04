@@ -3,10 +3,14 @@
 @using MagBlazor.Models
 @inject NavigationManager NavManager
 
-<h3>Родословная</h3>
 <div>
     <input @bind="searchsample" style="height:24px; margin-top:0px;margin-bottom:10px;" />
     <span>расш.<input type="checkbox" @bind="extended" /></span>
+    <span> </span>
+    <div style="display: inline-block; float:right; ">
+        <a href="/edit/@(entityId)">ред</a> |
+        <a href="/gene/@(entityId)">род</a>
+    </div>
 </div>
 @if (!string.IsNullOrEmpty(searchsample))
 {
@@ -32,26 +36,45 @@
         </div>
     }
 }
-@if (recordlevels != null)
-{
+@if (recordlevels == null || recordlevels.Count() == 0) { return; }
+<p class="grad">
+    <a href="gene" class="nov"><img src="images/ico-home.gif" class="ico-home" alt="" />Родословная</a>
+    &raquo;
+    @if (fm != null)
+    {
+        <a href="/gene/@(fm.Id)">@(fm.GetName())</a>
+        <span> &raquo; </span>
+    }
+    @(recordlevels[0].node.GetName())
+    @*&raquo;
+        m.GetName()*@
+</p>
+
+@{
     foreach (var rl in recordlevels)
     {
-        int otstup = 100 * rl.level;
+        int otstup = 80 * rl.level;
         <div style="margin-left:@(otstup)px;">
-            <MagBlazor.Components.ViewMidiPortrait record="@focusrecord" />
+            <MagBlazor.Components.ViewMidiPortrait record="@(rl.node)" />
+            
+            @if (rl.spouse != null)
+            {
+                <img src="/images/family.jpg" />
+                <MagBlazor.Components.ViewMidiPortrait record="@(rl.spouse)" />
+            }
         </div>
     }
 }
 
 @code {
-        [Parameter]
-        public string entityId { get; set; }
+    [Parameter]
+    public string entityId { get; set; }
 
 
     private string searchsample;
     private bool extended = false;
     private RRecord focusrecord;
-    private RRecordLevel[] recordlevels = null;
+    private GeneTreeModel[] recordlevels = null;
 
 
     private GeneTreeModel BuildMidiPortrait(string id, GeneTreeModel parent_node)
@@ -85,14 +108,22 @@
         model.childs = childs.ToArray();
         return model;
     }
+    private RRecord fm;
     private void Build(string id)
     {
         GeneTreeModel gt_model = BuildMidiPortrait(id, null);
         focusrecord = gt_model.node;
-        recordlevels = RRecordLevel.Traverse(gt_model);
+        recordlevels = GeneTreeModel.Traverse(gt_model);
+        // Предки 
+        var rtree = new RRecordTree(recordlevels[0].node.Id, Infobase.rontology);
+        fm = rtree.GetDirect("http://fogid.net/o/father");
+        if (fm == null) fm = rtree.GetDirect("http://fogid.net/o/mother");
+
     }
     private void SearchResultClick(RRecord rec)
     {
+        searchsample = null;
+        extended = false;
         Build(rec.Id);
     }
     protected override void OnParametersSet()

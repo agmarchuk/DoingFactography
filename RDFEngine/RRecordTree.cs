@@ -31,6 +31,12 @@ namespace RDFEngine
             return "" + fd ?? "" + (td == null ? "" : "-" + td);
         }
         public string GetLabel(string ontoTerm) => rontology.LabelOfOnto(ontoTerm);
+        public RRecord GetDirect(string propId)
+        {
+            int ind = rontology.PropPosition(Tp, propId, false);
+            if (ind == -1) return null;
+            return record.GetDirect(propId);
+        }
         public RRecord[] GetMultiInverse(string propId)
         {
             int ind = rontology.PropPosition(Tp, propId, true);

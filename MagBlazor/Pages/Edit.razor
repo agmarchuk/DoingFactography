@@ -4,10 +4,12 @@
 
 @{
     string lnk = "/view/" + entityId;
+    string lnk2 = "/gene/" + entityId;
     <div style="float:right;">
         <span>ru </span>
         User: <input type="text" @bind="_user" height="16" />
-        <NavLink href="@lnk">view</NavLink>&nbsp;
+        <NavLink href="@lnk">вид</NavLink>&nbsp;
+        <NavLink href="@lnk">род</NavLink>&nbsp;
     </div>
 }
 
