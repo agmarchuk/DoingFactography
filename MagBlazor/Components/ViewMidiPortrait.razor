@@ -1,6 +1,7 @@
 ﻿@using RDFEngine;
 
-@{ 
+@{
+    string sep = "";
 }
 <div style="display:inline-block;">
     <a href="gene/@(record.Id)"> @(name) </a>
@@ -10,11 +11,11 @@
     }
     @if (portrait != null)
     {
-        <span><img src="/Docs/GetImage/@(uri)" /></span>
+        <span><img src="/Docs/GetImage?s=small&u=@(uri)" /></span>
     }
-    @if (title != null)
+    @foreach (var title in titles)
     {
-        <span>@(title.GetField("http://fogid.net/o/degree"))</span>
+        @sep; sep = ", "; <span>@(title.GetField("http://fogid.net/o/degree"))&nbsp;</span>;
     }
 </div>
 
@@ -29,7 +30,7 @@
     private RRecord portrait;
     private string uri;
     private RRecord[] titles;
-    private RRecord title;
+    //private RRecord title;
 
     protected override void OnParametersSet()
     {
@@ -41,10 +42,10 @@
         portrait = reflections.FirstOrDefault(re => re.GetField("http://fogid.net/o/ground") == "portrait");
         if (portrait != null) uri = portrait.GetDirect("http://fogid.net/o/in-doc")?.GetField("http://fogid.net/o/uri");
         titles = rtree.GetMultiInverse("http://fogid.net/o/has-title");
-        title = titles.FirstOrDefault(ti => ti.GetDirect("http://fogid.net/o/support-org") != null);
-        if (title == null && titles.Length > 0)
+        titles = titles.Where(ti => ti.GetDirect("http://fogid.net/o/support-org") != null).ToArray();
+        if (titles.Length == 0)
         {
-            title = titles.OrderBy(ti => ti.GetField("http://fogid.net/o/from-date")).Last();
+            titles = titles.OrderBy(ti => ti.GetField("http://fogid.net/o/from-date")).TakeLast(2).ToArray();
         }
     }
 }

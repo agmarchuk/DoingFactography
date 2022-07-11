@@ -1,0 +1,17 @@
+﻿@page "/combine"
+@using RDFEngine
+@using System.Xml.Linq
+
+<h3>Combine</h3>
+<div>@(xelements.Length) records</div>
+
+@code {
+
+    private string typ = "http://fogid.net/o/person";
+    private XElement[] xelements; 
+    protected override void OnParametersSet()
+    {
+        xelements = OAData.OADB.adapter.GetAll().ToArray();
+        var query = (new RXEngine());
+    }
+}

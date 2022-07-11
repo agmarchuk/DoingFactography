@@ -10,6 +10,7 @@ namespace RDFEngine
     public class RXEngine : IEngine
     {
         public string User { get; set; }
+        public bool All { get; set; }
         public void Build()
         {
             throw new NotImplementedException();
@@ -22,6 +23,10 @@ namespace RDFEngine
 
         public IEnumerable<RRecord> RSearch(string searchstring)
         {
+            if (string.IsNullOrEmpty(searchstring))
+            {
+                var res0 = OAData.OADB.
+            }
             var res = OAData.OADB.SearchByName(searchstring)
                 .Select(x => new RRecord
                 {
