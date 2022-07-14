@@ -25,7 +25,7 @@ namespace RDFEngine
         {
             if (string.IsNullOrEmpty(searchstring))
             {
-                var res0 = OAData.OADB.
+                return new RRecord[0];
             }
             var res = OAData.OADB.SearchByName(searchstring)
                 .Select(x => new RRecord
@@ -50,6 +50,23 @@ namespace RDFEngine
         public IEnumerable<RRecord> RSearchByWords(string searchstring)
         {
             var res = OAData.OADB.SearchByWords(searchstring)
+                .Select(x => new RRecord
+                {
+                    Id = x.Attribute("id").Value,
+                    Tp = x.Attribute("type").Value,
+                    Props = x.Elements()
+                        .Select(e =>
+                        {
+                            if (e.Name == "field") return new RField { Prop = e.Attribute("prop").Value, Value = e.Value };
+                            return null;
+                        }).ToArray()
+
+                }).ToArray();
+            return res;
+        }
+        public IEnumerable<RRecord> RAll()
+        {
+            var res = OAData.OADB.SearchByName("")
                 .Select(x => new RRecord
                 {
                     Id = x.Attribute("id").Value,

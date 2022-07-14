@@ -12,6 +12,7 @@ namespace RDFEngine
         public void Load(IEnumerable<XElement> records);
         public void Build();
         public IEnumerable<RRecord> RSearch(string searchstring);
+        public IEnumerable<RRecord> RAll();
 
         public IEnumerable<RRecord> RSearch(string searchstring, string type);
         public RRecord GetRRecord(string id);

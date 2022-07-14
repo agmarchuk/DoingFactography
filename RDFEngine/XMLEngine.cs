@@ -172,5 +172,9 @@ namespace RDFEngine
             throw new NotImplementedException();
         }
 
+        public IEnumerable<RRecord> RAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

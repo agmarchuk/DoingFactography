@@ -342,5 +342,10 @@ namespace RDFEngine
         {
             return rdatabase.Select(r => r.Value);
         }
+
+        public IEnumerable<RRecord> RAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
