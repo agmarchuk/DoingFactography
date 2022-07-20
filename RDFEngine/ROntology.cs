@@ -385,7 +385,7 @@ namespace RDFEngine
             // Пройдемся по свойствам обрабатываемой записи rrecord, значения скопируем в выходной массив на соответствующей позиции
             foreach (var p in record.Props)
             {
-                if (p is RInverse) continue;
+                if (p == null || p is RInverse) continue;
                 if (dicProps.ContainsKey(p.Prop))
                 {
                     int n = dicProps[p.Prop];

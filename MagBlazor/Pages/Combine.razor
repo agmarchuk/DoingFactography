@@ -10,11 +10,22 @@
 <div>@(nphotos) photos</div>
 <div>@(nvideo) video</div>
 
+@foreach (var gr in groupsOfSame)
+{
+    <div>----------</div>
+    @foreach (RRecord r in gr)
+    {
+        <div> @(r.Id) @(r.GetName()) @(r.GetDates())) </div>
+    }
+    <MagBlazor.Components.DrawTable records="@(gr)"/>
+}
+
 @code {
 
     private string typ = "http://fogid.net/o/person";
     private RRecord[] relements;
     private int nall, npersons, norgsys, ndocuments, nphotos, nvideo;
+    private RRecord[][] groupsOfSame;
     protected override void OnParametersSet()
     {
         var rels = (new RXEngine()).RAll();
@@ -28,5 +39,24 @@
             else if (el.Tp == "http://fogid.net/o/video-doc") { nvideo += 1; }
 
         }
+        // Выделение из объектов типа typ пар имя - идентификатор
+        groupsOfSame = (new RXEngine()).RAll()
+        .Where(rel => rel.Tp == typ)
+        .Select(rel => new { name = rel.GetName(), r = rel })
+        .GroupBy(pair => pair.name)
+        .Select(gr =>
+        {
+            var list = gr.Select(g => g).ToArray();
+            return new { key = gr.Key, list = (list.Count() > 1 ? list : null) };
+        })
+        .Where(kl => kl.list != null)
+        .Select(kl => kl.list.Select(nr => nr.r)
+            .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = Infobase.rontology.ReorderFieldsDirects(rr, "ru") })
+            .ToArray())
+        .ToArray()
+        //.Where(dupl = )
+        ;
+
     }
+
 }
