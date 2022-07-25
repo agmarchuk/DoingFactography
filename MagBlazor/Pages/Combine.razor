@@ -10,15 +10,29 @@
 <div>@(nphotos) photos</div>
 <div>@(nvideo) video</div>
 
-@foreach (var gr in groupsOfSame)
+@if (firstvisible < groupsOfSame.Length)
 {
-    <div>----------</div>
+    foreach (var r in groupsOfSame[firstvisible])
+    {
+        <div>
+            <button @onclick="() => Choose(r.Id)">выбрать</button>
+            @(r.Id) <a href="/edit/@(r.Id)" target="_blank"> @(r.GetName())</a> @(r.GetDates())
+        </div>
+    }
+    <MagBlazor.Components.DrawTable records="@(groupsOfSame[firstvisible])" />
+}
+@foreach (var gr in groupsOfSame.Skip(firstvisible + 1))
+{
+    <div>=======================</div>
+
     @foreach (RRecord r in gr)
     {
-        <div> @(r.Id) @(r.GetName()) @(r.GetDates())) </div>
+        <div> @(r.Id) <a href="/edit/@(r.Id)" target="_blank"> @(r.GetName())</a> @(r.GetDates()) </div>
     }
-    <MagBlazor.Components.DrawTable records="@(gr)"/>
+    <MagBlazor.Components.DrawTable records="@(gr)" />
 }
+
+<button @onclick="Reload">Reload</button>
 
 @code {
 
@@ -26,6 +40,8 @@
     private RRecord[] relements;
     private int nall, npersons, norgsys, ndocuments, nphotos, nvideo;
     private RRecord[][] groupsOfSame;
+    int firstvisible = 0;
+
     protected override void OnParametersSet()
     {
         var rels = (new RXEngine()).RAll();
@@ -51,12 +67,29 @@
         })
         .Where(kl => kl.list != null)
         .Select(kl => kl.list.Select(nr => nr.r)
-            .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = Infobase.rontology.ReorderFieldsDirects(rr, "ru") })
+            .Select(rr =>
+            {
+                RRecord r = (new RXEngine()).GetRRecord(rr.Id);
+                return new RRecord { Id = r.Id, Tp = r.Tp, Props = Infobase.rontology.ReorderFieldsDirects(r, "ru") };
+            })
             .ToArray())
         .ToArray()
         //.Where(dupl = )
         ;
+    }
+    private void Choose(string id)
+    {
+        foreach (var rr in groupsOfSame[firstvisible].Where(r => r.Id != id))
+        {
+            (new RXEngine()).Substitute(rr.Id, id, "mag111");
+            firstvisible += 1;
+            StateHasChanged();
+        }
 
     }
-
+    private void Reload()
+    {
+        OAData.OADB.Reload();
+        StateHasChanged();
+    }
 }

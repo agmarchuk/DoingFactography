@@ -182,6 +182,13 @@ namespace RDFEngine
             if (res.Name == "error") throw new Exception(res.Value);
             return res != null ? true : false;
         }
+        public void Substitute(string oldid, string newid, string user)
+        {
+            OAData.OADB.PutItem(new XElement("substitute",
+                new XAttribute("old-id", oldid),
+                new XAttribute("new-id", newid),
+                new XAttribute("owner", user)));
+        }
 
         private XName ToXName(string name)
         {
