@@ -59,7 +59,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
 {
     string sr = "/Docs/GetVideo?u=" + uri;
     <div style="text-align: center;">
-        <video src="@sr" />
+        <video src="@sr" controls />
     </div>
 }
 
@@ -203,6 +203,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                 @foreach (var refle in indoc_reflections.Where(re => re != null))
                 {
                     RRecord who = refle.GetDirect("http://fogid.net/o/reflected");
+                    if (who == null) continue;
                     string lnk = "/view/" + who.Id;
                     @se; se = ", "; <NavLink href='@lnk'>@who.GetName()</NavLink>;
                 }
@@ -297,6 +298,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                         @foreach (var participation in participants)
                         {
                             RRecord who = participation.GetDirect("http://fogid.net/o/participant");
+                            if (who == null) continue;
                             string lnk = "/view/" + who.Id;
                             @sep; sep = ", "; <NavLink href='@lnk'>@who.GetName()</NavLink>;
                         }
