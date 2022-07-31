@@ -8,8 +8,8 @@
     <span>расш.<input type="checkbox" @bind="extended" /></span>
     <span> </span>
     <div style="display: inline-block; float:right; ">
-        <a href="/edit/@(entityId)">ред</a> |
-        <a href="/gene/@(entityId)">род</a>
+        <a href="edit/@(entityId)">ред</a> |
+        <a href="gene/@(entityId)">род</a>
     </div>
 </div>
 @if (!string.IsNullOrEmpty(searchsample))
@@ -42,7 +42,7 @@
     &raquo;
     @if (fm != null)
     {
-        <a href="/gene/@(fm.Id)">@(fm.GetName())</a>
+        <a href="gene/@(fm.Id)">@(fm.GetName())</a>
         <span> &raquo; </span>
     }
     @(recordlevels[0].node.GetName())

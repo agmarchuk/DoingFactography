@@ -20,9 +20,9 @@
 </div>
 @if (externalId != null)
 {
-    string pr = "/view/" + prev + "/" + externalId;
-    string d = "/view/" + externalId;
-    string nx = "/view/" + next + "/" + externalId;
+    string pr = "view/" + prev + "/" + externalId;
+    string d = "view/" + externalId;
+    string nx = "view/" + next + "/" + externalId;
     <div style="text-align: center;">
         <NavLink href="@d">к документу</NavLink>
         &nbsp;
@@ -50,14 +50,14 @@
 }
 @if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/photo-doc")
 {
-    string sr = "/Docs/GetImage?u=" + uri + "&s=medium";
+    string sr = "docs/GetImage?u=" + uri + "&s=medium";
     <div style="text-align: center;">
         <img src="@sr" />
     </div>
 }
 else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
 {
-    string sr = "/Docs/GetVideo?u=" + uri;
+    string sr = "docs/GetVideo?u=" + uri;
     <div style="text-align: center;">
         <video src="@sr" controls />
     </div>
@@ -142,8 +142,8 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
 
                     if (uri != null && uri.StartsWith("iiss://"))
                     {
-                        string sr = "/Docs/GetImage?u=" + uri + "&s=small";
-                        string lnk = "/view/" + pitem.Id + "/" + m.Id;
+                        string sr = "docs/GetImage?u=" + uri + "&s=small";
+                        string lnk = "view/" + pitem.Id + "/" + m.Id;
                         <div class="show-small">
                             <NavLink href="@lnk">
                                 <img src="@sr" border="0" vspace="10" hspace="10" alt="" />
@@ -185,7 +185,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                 @foreach (var refle in adoc_authorities.Where(re => re != null))
                 {
                     RRecord who = refle.GetDirect("http://fogid.net/o/author");
-                    string lnk = "/view/" + who.Id;
+                    string lnk = "view/" + who.Id;
                     <NavLink href='@lnk'>@who.GetName()</NavLink>;
                 }
             </td>
@@ -204,7 +204,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                 {
                     RRecord who = refle.GetDirect("http://fogid.net/o/reflected");
                     if (who == null) continue;
-                    string lnk = "/view/" + who.Id;
+                    string lnk = "view/" + who.Id;
                     @se; se = ", "; <NavLink href='@lnk'>@who.GetName()</NavLink>;
                 }
             </td>
@@ -226,8 +226,8 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                     @foreach (var member in incoll_member_photos)
                     {
                         RRecord elem = member.GetDirect("http://fogid.net/o/collection-item");
-                        string lnk = "/view/" + elem.Id;
-                        string ur = "/docs/GetImage?s=small&u=" + elem.GetField("http://fogid.net/o/uri");
+                        string lnk = "view/" + elem.Id;
+                        string ur = "docs/GetImage?s=small&u=" + elem.GetField("http://fogid.net/o/uri");
                         <NavLink href='@lnk'> <img src="@ur" /> </NavLink>
                     }
                 </div>
@@ -242,7 +242,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                 @foreach (var member in incoll_member_rest)
                 {
                     RRecord elem = member.GetDirect("http://fogid.net/o/collection-item");
-                    string lnk = "/view/" + elem.Id;
+                    string lnk = "view/" + elem.Id;
                     <NavLink href='@lnk'>@elem.GetName()</NavLink> <br />
                 }
             </td>
@@ -259,7 +259,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                 @foreach (var member in item_member)
                 {
                     RRecord coll = member.GetDirect("http://fogid.net/o/in-collection");
-                    string lnk = "/view/" + coll.Id;
+                    string lnk = "view/" + coll.Id;
                     <NavLink href='@lnk'>@coll.GetName()</NavLink> <br />
                 }
             </td>
@@ -278,7 +278,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                         @foreach (var participation in particips)
                         {
                             RRecord where = participation.GetDirect("http://fogid.net/o/in-org");
-                            string lnk = "/view/" + where.Id;
+                            string lnk = "view/" + where.Id;
                             @sep; sep = ", "; <NavLink href='@lnk'>@where.GetName()</NavLink>;
                         }
                     }
@@ -299,7 +299,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                         {
                             RRecord who = participation.GetDirect("http://fogid.net/o/participant");
                             if (who == null) continue;
-                            string lnk = "/view/" + who.Id;
+                            string lnk = "view/" + who.Id;
                             @sep; sep = ", "; <NavLink href='@lnk'>@who.GetName()</NavLink>;
                         }
                     }
@@ -320,7 +320,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                         @foreach (var relatives in child_relatives)
                         {
                             RRecord parent = relatives.GetDirect("http://fogid.net/o/org-parent");
-                            string lnk = "/view/" + parent.Id;
+                            string lnk = "view/" + parent.Id;
                             @sep; sep = ", "; <NavLink href='@lnk'>@parent.GetName()</NavLink>;
                         }
                     }
@@ -340,7 +340,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                         @foreach (var relatives in parent_relatives)
                         {
                             RRecord child = relatives.GetDirect("http://fogid.net/o/org-child");
-                            string lnk = "/view/" + child.Id;
+                            string lnk = "view/" + child.Id;
                             @sep; sep = ", "; <NavLink href='@lnk'>@child.GetName()</NavLink>;
                         }
                     }
@@ -368,7 +368,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
             {
                 RRecord doc = authority.GetDirect("http://fogid.net/o/adoc");
                 string dt = doc.GetField("http://fogid.net/o/from-date");
-                string lnk = "/view/" + doc.Id;
+                string lnk = "view/" + doc.Id;
                 string asp = authority.GetField("http://fogid.net/o/authority-specificator");
                 string val = Infobase.rontology.EnumValue("http://fogid.net/o/authority-specificator", asp, "ru");
                 <tr valign="top">
@@ -399,8 +399,8 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                 RRecord doc = reflection.GetDirect("http://fogid.net/o/in-doc");
                 string dt = doc.GetField("http://fogid.net/o/from-date");
                 uri = doc.GetField("http://fogid.net/o/uri");
-                string lnk = "/view/" + doc.Id;
-                string sr = "/Docs/GetImage?s=small&u=" + uri;
+                string lnk = "view/" + doc.Id;
+                string sr = "docs/GetImage?s=small&u=" + uri;
                 <a href="@lnk"> <img src='@sr' /> </a>
             }
         </div>
@@ -420,7 +420,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
             {
                 RRecord doc = reflection.GetDirect("http://fogid.net/o/in-doc");
                 string dt = doc.GetField("http://fogid.net/o/from-date");
-                string lnk = "/view/" + doc.Id;
+                string lnk = "view/" + doc.Id;
                 string descr = doc.GetField("http://fogid.net/o/description");
                 <tr valign="top">
                     <td>@dt</td>

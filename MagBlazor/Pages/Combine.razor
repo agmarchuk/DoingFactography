@@ -16,7 +16,7 @@
     {
         <div>
             <button @onclick="() => Choose(r.Id)">выбрать</button>
-            @(r.Id) <a href="/edit/@(r.Id)" target="_blank"> @(r.GetName())</a> @(r.GetDates())
+            @(r.Id) <a href="edit/@(r.Id)" target="_blank"> @(r.GetName())</a> @(r.GetDates())
         </div>
     }
     <MagBlazor.Components.DrawTable records="@(groupsOfSame[firstvisible])" />
@@ -27,7 +27,7 @@
 
     @foreach (RRecord r in gr)
     {
-        <div> @(r.Id) <a href="/edit/@(r.Id)" target="_blank"> @(r.GetName())</a> @(r.GetDates()) </div>
+        <div> @(r.Id) <a href="edit/@(r.Id)" target="_blank"> @(r.GetName())</a> @(r.GetDates()) </div>
     }
     <MagBlazor.Components.DrawTable records="@(gr)" />
 }

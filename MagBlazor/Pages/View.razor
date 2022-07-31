@@ -3,7 +3,7 @@
 @inject NavigationManager NavManager
 
 @{
-    string lnk = "/edit/" + entityId;
+    string lnk = "edit/" + entityId;
     <div style="float:right;">
         <NavLink href="@lnk">edit</NavLink>
     </div>
@@ -38,7 +38,7 @@
     {
         //entityId = id;
         //Build(entityId);
-        NavManager.NavigateTo("/view/" + id);
+        NavManager.NavigateTo("view/" + id);
     }
     private void Build(string id)
     {
