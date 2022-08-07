@@ -128,6 +128,23 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
             <td width="75%" class="line-info">@description</td>
         </tr>
     }
+    @{
+        RRecord[] item_member = m.GetMultiInverse("http://fogid.net/o/collection-item");
+    }
+    @if (item_member != null && item_member.Count() > 0)
+    {
+        <tr valign="top">
+            <td width="25%" class="line-name">Является элементом в коллекциях:</td>
+            <td width="75%" class="line-info">
+                @foreach (var member in item_member)
+                {
+                    RRecord coll = member.GetDirect("http://fogid.net/o/in-collection");
+                    string lnk = "view/" + coll.Id;
+                    <NavLink href='@lnk'>@coll.GetName()</NavLink> <br />
+                }
+            </td>
+        </tr>
+    }
     @{ RRecord[] indoc_parts = m.GetMultiInverse("http://fogid.net/o/inDocument"); }
     @if (indoc_parts != null && indoc_parts.Count() > 0)
     {
@@ -244,23 +261,6 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                     RRecord elem = member.GetDirect("http://fogid.net/o/collection-item");
                     string lnk = "view/" + elem.Id;
                     <NavLink href='@lnk'>@elem.GetName()</NavLink> <br />
-                }
-            </td>
-        </tr>
-    }
-    @{
-        RRecord[] item_member = m.GetMultiInverse("http://fogid.net/o/collection-item");
-    }
-    @if (item_member != null && item_member.Count() > 0)
-    {
-        <tr valign="top">
-            <td width="25%" class="line-name">Является элементом в коллекциях:</td>
-            <td width="75%" class="line-info">
-                @foreach (var member in item_member)
-                {
-                    RRecord coll = member.GetDirect("http://fogid.net/o/in-collection");
-                    string lnk = "view/" + coll.Id;
-                    <NavLink href='@lnk'>@coll.GetName()</NavLink> <br />
                 }
             </td>
         </tr>
