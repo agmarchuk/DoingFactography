@@ -1,4 +1,4 @@
-﻿@page "/edit/{entityId?}"
+﻿@page "/edit/{entityId?}/{eid?}"
 @using RDFEngine
 @using MagBlazor
 
@@ -19,6 +19,36 @@
 <MagBlazor.Components.Search onSelected="(rid) => UtilizeRecord((string)rid)" searchsample="@searchsample" typs="@tps" user="@user" />
 @if (focusRec != null)
 {
+    @* ========    Это вставка полоски пред. след. к документу =========     *@
+    @if (externalId != null)
+    {
+        string pr = "edit/" + prev + "/" + externalId;
+        string d = "edit/" + externalId;
+        string nx = "edit/" + next + "/" + externalId;
+        <div style="text-align: center;">
+            <NavLink href="@d">к документу</NavLink>
+            &nbsp;
+            @if (prev == null)
+            {
+                <span>пред.</span>
+            }
+            else
+            {
+                <NavLink href="@pr"><span>пред.</span></NavLink>
+            }
+            &nbsp;
+            @if (next == null)
+            {
+                <span>след.</span>
+            }
+            else
+            {
+                <NavLink href="@nx"><span>след.</span></NavLink>
+            }
+        </div>
+    }
+
+
     if (focusRec.Tp == "http://fogid.net/o/photo-doc")
     {
         string sr = "docs/GetImage?u=" + ((RField)focusRec.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri")).Value + "&s=normal";
@@ -45,7 +75,6 @@
 
         <MagBlazor.Components.DrawTable focusId="@focusRec.Id" inverseTp="@focusRec.Tp" records="@(new RRecord[] { focusRec })" onGo="(id) => Build((string)id)" user="@user" />
         var list2 = Infobase.rontology.AncestorsAndSelf(focusRec.Tp).SelectMany(t => Infobase.rontology.GetInversePropsByType(t)).Distinct();
-        //look =  "" + list2.Count() + " " + list2.Aggregate((a, s) => a + " | " + s);
         foreach (var propName in list2)
         {
             var pr = focusInversePropTypes.FirstOrDefault(ipt => ipt.Prop == propName);
@@ -80,8 +109,10 @@
 }
 
 @code{
-    [Parameter]
+    [Parameter] // Фокусная запись
     public string entityId { get; set; }
+    [Parameter] // Внешная запись
+    public string eid { get; set; }
 
     // Пользователь
     private string _user
@@ -112,8 +143,10 @@
     }
 
     // Построение фокусного элемента по его идентификатору
+    private string prev = null, next = null, externalId = null;
     private void Build(string recId)
     {
+        prev = null; next = null; externalId = null;
         RRecord erec = (new RDFEngine.RXEngine() { User = user }).BuildPortrait(recId); // ((REngine)(Infobase.engine)).BuildPortrait(recId);
         if (erec == null)
         {
@@ -143,6 +176,46 @@
         focusInversePropTypes = query;
         focusRec = new RRecord { Id = erec.Id, Tp = erec.Tp, Props = Infobase.rontology.ReorderFieldsDirects(erec, "ru") };
         entityId = recId;
+
+        // ======== Вычисление полоски ==========
+        if (eid != null)
+        {
+            externalId = eid;
+            RRecord externalRec = (new RXEngine()).GetRRecord(externalId, true);
+            var rxobj = new RXEngine();
+            string[] docset = new string[0];
+            if (externalRec.Tp == "http://fogid.net/o/document")
+                docset = externalRec.Props
+                    .Where(p => p is RInverseLink && p.Prop == "http://fogid.net/o/inDocument").Cast<RInverseLink>()
+                    .Select(l =>
+                    {
+                        RRecord r = rxobj.GetRRecord(l.Source, false);
+                        return new { r = r, pg = r.GetField("http://fogid.net/o/pageNumbers") };
+                    })
+                    .OrderBy(rpg => rpg.pg)
+                    .Select(rpg => rpg.r.GetDirectResource("http://fogid.net/o/partItem"))
+                    .ToArray();
+            // Другой вариант
+            if (externalRec.Tp == "http://fogid.net/o/collection")
+                docset = externalRec.Props
+                    .Where(p => p is RInverseLink && p.Prop == "http://fogid.net/o/in-collection").Cast<RInverseLink>()
+                    .Cast<RInverseLink>()
+                    .Select(ril => rxobj.GetRRecord(ril.Source, false).GetDirectResource("http://fogid.net/o/collection-item"))
+                    .ToArray();
+            int ind = Array.IndexOf(docset, erec.Id);
+            if (ind != -1 && ind - 1 >= 0)
+            {
+                prev = docset[ind - 1];
+            }
+            else prev = null;
+            if (ind != -1 && ind + 1 < docset.Length)
+            {
+                next = docset[ind + 1];
+            }
+            else next = null;
+        }
+
+
     }
 
     private void BuildInverseTable(string prop, string typ)
@@ -156,6 +229,13 @@
     private string look = "";
 
     protected override void OnInitialized() // = On Page Load
+    {
+        if (entityId != null)
+        {
+            Build(entityId);
+        }
+    }
+    protected override void OnParametersSet()
     {
         if (entityId != null)
         {

@@ -23,7 +23,7 @@ else
             </td>
         </tr>
         <tr valign="top" style="background-color:lightgray; font-size:smaller; font-weight: bold;">
-            @foreach (var c in defrow.Props.Where(p => p.Prop != inverseProp))
+            @foreach (var c in defrow.Props.Where(p => Allowed(p.Prop, inverseProp)))
             {
                 <td>@(Infobase.rontology.LabelOfOnto(c.Prop))</td>
             }
@@ -34,14 +34,14 @@ else
         </tr>
         @foreach (var r in records)
         {
-            <tr>
-                @if (erecord != null && r.Id == erecord.Id)
-                { // Редактирование ячеек
-                <td colspan="@(r.Props.Length + 1)" style="border:dashed;">
-                    <table border="1">
-                        @* Это рядки записи, предназначенной для редактирования *@
-                        @foreach (var c in erecord.Props.Where(p => p.Prop != inverseProp))
-                        {
+    <tr>
+        @if (erecord != null && r.Id == erecord.Id)
+        { // Редактирование ячеек
+            <td colspan="@(r.Props.Length + 1)" style="border:dashed;">
+                <table border="1">
+                    @* Это рядки записи, предназначенной для редактирования *@
+                    @foreach (var c in erecord.Props.Where(p => Allowed(p.Prop, inverseProp)))
+                    {
                         <tr>
                             <td>@(Infobase.rontology.LabelOfOnto(c.Prop))</td>
                             @if (c is RField)
@@ -51,22 +51,22 @@ else
                                 if (Infobase.rontology.IsEnumeration(c.Prop))
                                 {
                                     var states = Infobase.rontology.EnumPairs(c.Prop, "ru");
-                        <td>
-                            <select @onchange="@(e => SelectChangeHandler(e.Value, c))">
-                                <option value=""></option>
-                                @foreach (var item in states)
-                                {
-                                    if (f.Value == item.Key)
-                                    {
-                                        <option selected="selected" value="@item.Key">@item.Value</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item.Key">@item.Value</option>
-                                    }
-                                }
-                            </select>
-                        </td>
+                                    <td>
+                                        <select @onchange="@(e => SelectChangeHandler(e.Value, c))">
+                                            <option value=""></option>
+                                            @foreach (var item in states)
+                                            {
+                                                if (f.Value == item.Key)
+                                                {
+                                                    <option selected="selected" value="@item.Key">@item.Value</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@item.Key">@item.Value</option>
+                                                }
+                                            }
+                                        </select>
+                                    </td>
                                 }
                                 else
                                 {
@@ -108,67 +108,108 @@ else
                                 }
                             }
                         </tr>
-                        }
-                        <tr>
-                            <td colspan="2">
-                                <button @onclick="Ok">ok</button>
-                                <button @onclick="Cancel">cancel</button>
-                            </td>
-                        </tr>
-                    </table>
+                    }
+                    <tr>
+                        <td colspan="2">
+                            <button @onclick="Ok">ok</button>
+                            <button @onclick="Cancel">cancel</button>
+                        </td>
+                    </tr>
+                </table>
 
-                </td>
+            </td>
+        }
+        else
+        { // Обычный ряд значений
+          // переменная означает, что данная запись а) обратное отношение; б) системного типа
+            bool isinversesysobj = inverseProp != null &&
+                ROntology.parentsDictionary[r.Tp].Contains("http://fogid.net/o/sys-obj");
+            @foreach (var c in r.Props.Where(p => Allowed(p.Prop, inverseProp)))
+            {
+                if (c is RField)
+                {
+                    string val = ((RField)c).Value;
+                    <!-- ~~~~~~~~~~~ Вариант перечислимого  ~~~~~~~~~~~-->
+                    if (!string.IsNullOrEmpty(val) && Infobase.rontology.IsEnumeration(c.Prop))
+                    {
+                        val = Infobase.rontology.EnumValue(c.Prop, val, "ru");
+                    }
+                    if (isinversesysobj && c.Prop == "http://fogid.net/o/name")
+                    {
+                        <td> <a href="edit/@(r.Id)"> @(val) </a> </td>
+                    }
+                    else
+                    {
+                        <td>@(val)</td>
+                    }
+                }
+                else if (c is RDirect)
+                {
+                    var rr = ((RDirect)c).DRec;
+
+                    if (rr != null)
+                    {
+    <td>
+        @*<a href="javascript:void(0)" @onclick="@(e =>LinkClick(rr.Id))">
+            @if (rr.Tp == "http://fogid.net/o/photo-doc")
+            {
+                string sr = "docs/GetImage?u=" + ((RField)rr.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri"))?.Value + "&s=small";
+                <img src="@sr" />
+            }
+            else
+            {
+                @(Infobase.GetName(rr))
+            }
+        </a>*@
+        @{ 
+            string lnk = "edit/" + rr.Id;
+            if (r != null &&
+                ((r.Tp == "http://fogid.net/o/DocumentPart" &&
+                c.Prop == "http://fogid.net/o/partItem") ||
+                (r.Tp == "http://fogid.net/o/collection-member" &&
+                c.Prop == "http://fogid.net/o/collection-item"))
+                ) lnk += "/" + focusId;
+        }
+        <a href="@lnk">
+            @if (rr.Tp == "http://fogid.net/o/photo-doc")
+            {
+                string sr = "docs/GetImage?u=" + ((RField)rr.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri"))?.Value + "&s=small";
+                <img src="@sr" />
+            }
+            else
+            {
+                @(Infobase.GetName(rr))
+            }
+        </a>
+    </td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
                 }
                 else
-                { // Обычный ряд значений
-                    @foreach (var c in r.Props.Where(p => p.Prop != inverseProp))
-                    {
-                        if (c is RField)
-                        {
-                            string val = ((RField)c).Value; 
-                            <!-- ~~~~~~~~~~~ Вариант перечислимого  ~~~~~~~~~~~-->
-                            if (!string.IsNullOrEmpty(val)  && Infobase.rontology.IsEnumeration(c.Prop)) 
-                            { 
-                                val = Infobase.rontology.EnumValue(c.Prop, val, "ru"); 
-                            }
-                            <td>@(val)</td>
-                        }
-                        else if (c is RDirect)
-                        {
-                            var rr = ((RDirect)c).DRec;
-                            
-                            if (rr != null)
-                            {
-                                <td>
-                                    <a href="javascript:void(0)" @onclick="@(e =>LinkClick(rr.Id))">
-                                        @if (rr.Tp == "http://fogid.net/o/photo-doc")
-                                        {
-                                            string sr = "docs/GetImage?u=" + ((RField)rr.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri"))?.Value + "&s=small";
-                                            <img src="@sr" />
-                                        }
-                                        else
-                                        {
-                                            @(Infobase.GetName(rr))
-                                        }
-                                    </a>
-                                </td>
-                            }
-                            else
-                            {
-                                <td></td>
-                            }
-                        }
-                        else
-                        {
-                            <td>???</td>
-                        }
-                    }
-                    @if (toedit)
-                    {
-                        <td><a href="javascript:void(0)" @onclick="@(e =>EdClick(r.Id))">ред.</a> | <a href="javascript:void(0)" @onclick="@(e =>DelClick(r.Id))">x</a></td>
-                    }
+                {
+                    <td>???</td>
                 }
-            </tr>
+            }
+            @if (toedit)
+            {
+    <td>
+        @if (isinversesysobj)
+        {
+            // Редактировать системый объект не будем, уничтожать тоже
+        }
+        else
+        {
+            <a href="javascript:void(0)" @onclick="@(e =>EdClick(r.Id))">ред.</a>
+            <span> | </span> 
+            <a href="javascript:void(0)" @onclick="@(e =>DelClick(r.Id))">x</a>
+        }
+    </td>
+            }
+        }
+    </tr>
         }
     </table>
 }
@@ -302,5 +343,9 @@ else
     {
         ((RField)bindProperty).Value = e.ToString();
     }
+    private static bool Allowed(string prop, string forbidden) =>
+        prop != forbidden &&
+        prop != "http://fogid.net/o/uri" &&
+        prop != "http://fogid.net/o/docmetainfo";
 
 }
