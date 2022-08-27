@@ -174,7 +174,7 @@ else
             @if (rr.Tp == "http://fogid.net/o/photo-doc")
             {
                 string sr = "docs/GetImage?u=" + ((RField)rr.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri"))?.Value + "&s=small";
-                <img src="@sr" />
+                <img src="@sr"/>
             }
             else
             {

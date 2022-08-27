@@ -66,7 +66,8 @@ namespace RDFEngine
         }
         public IEnumerable<RRecord> RAll()
         {
-            var res = OAData.OADB.SearchByName("")
+            var res = OAData.OADB.GetAll()
+            //var res = OAData.OADB.SearchByName("")
                 .Select(x => new RRecord
                 {
                     Id = x.Attribute("id").Value,

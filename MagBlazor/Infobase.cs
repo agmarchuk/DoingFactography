@@ -17,9 +17,10 @@ namespace MagBlazor
         //public static bool toedit = false;
 
         // Инициирование приложения, включая чтение и активирование онтологии, пристоединение к базе данных
-        private static string path;
+        private static string _path;
         public static void Init(string path)
         {
+            _path = path;
             //Infobase.engine = new RDFEngine.REngine();
 
             OAData.OADB.Init(path);
@@ -31,6 +32,8 @@ namespace MagBlazor
 
             Infobase.rontology = new RDFEngine.ROntology(path + "ontology_iis-v13.xml");
         }
+        public static void Init() { Init(_path); }
+        public static void Reload() { OAData.OADB.Close(); Init(); } 
 
         //public static void Init0(string pth)
         //{

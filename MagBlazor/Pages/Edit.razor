@@ -6,6 +6,11 @@
     string lnk = "view/" + entityId;
     string lnk2 = "gene/" + entityId;
     <div style="float:right;">
+        @if (_user != null)
+        {
+            <input @bind="newid" />
+            <button @onclick="Substitute">Нов.Id</button>
+        }
         <span>ru </span>
         User: <input type="text" @bind="_user" height="16" />
         <NavLink href="@lnk">вид</NavLink>&nbsp;
@@ -48,16 +53,16 @@
         </div>
     }
 
-
+    string uri = ((RField)focusRec.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri"))?.Value;
     if (focusRec.Tp == "http://fogid.net/o/photo-doc")
     {
-        string sr = "docs/GetImage?u=" + ((RField)focusRec.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri")).Value + "&s=normal";
+        string sr = "docs/GetImage?u=" + uri + "&s=normal";
         <img src="@sr" />
 
     }
-    if (focusRec.Tp == "http://fogid.net/o/video-doc")
+    else if (focusRec.Tp == "http://fogid.net/o/video-doc")
     {
-        string sr = "docs/GetVideo?u=" + ((RField)focusRec.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri")).Value + "&s=normal";
+        string sr = "docs/GetVideo?u=" + uri + "&s=normal";
         <video width="480" controls>
             <source type="video/webm" src='@(sr + "&ext=webm")' />
             <source type="video/mp4" src='@(sr + "&ext=mp4")' />
@@ -65,11 +70,22 @@
         </video>
 
     }
+    else if (focusRec.Tp == "http://fogid.net/o/document")
+    {
+        string docmetainfo = ((RField)focusRec.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/docmetainfo"))?.Value;
+        if (docmetainfo != null)
+        {
+            string sr = "docs/GetPdf?u=" + uri;
+            <embed src="@sr" width="100%" height="800" />
+        }
+
+    }
     @*else if (documenttype == "application/pdf")
         {
             string src = url == null ? Url.Content("~/Docs/GetPdf?u=" + uri_coded) : url;
             <embed src="@src" width="1024" height="800" />
         }*@
+
     try
     {
 
@@ -121,6 +137,18 @@
         set { if (!string.IsNullOrEmpty(value) && OAData.OADB.HasWritabeFogForUser(value)) user = value; else user = null; }
     }
     private string user;
+    private string newid;
+    private void Substitute()
+    {
+        if (entityId != null && newid != null)
+        {
+            (new RXEngine()).Substitute(entityId, newid, _user);
+            Infobase.Reload();
+            entityId = newid;
+            newid = null;
+            Build(entityId);
+        }
+    }
 
     // Признак редактирования
     private bool toedit { get { return !string.IsNullOrEmpty(user); } }
@@ -196,7 +224,8 @@
                     .Select(rpg => rpg.r.GetDirectResource("http://fogid.net/o/partItem"))
                     .ToArray();
             // Другой вариант
-            if (externalRec.Tp == "http://fogid.net/o/collection")
+            if (externalRec.Tp == "http://fogid.net/o/collection" ||
+                externalRec.Tp == "http://fogid.net/o/cassette")
                 docset = externalRec.Props
                     .Where(p => p is RInverseLink && p.Prop == "http://fogid.net/o/in-collection").Cast<RInverseLink>()
                     .Cast<RInverseLink>()

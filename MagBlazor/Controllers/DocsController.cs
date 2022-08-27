@@ -25,11 +25,23 @@ namespace MagBlazor.Controllers
         {
             string path = OAData.OADB.GetFilePath(u, "medium");
             if (path == null) return NotFound();
+
             string dir_path = path.Substring(0, path.Length - 5);
             string file_num = path.Substring(path.Length - 4);
             System.IO.DirectoryInfo dinfo = new System.IO.DirectoryInfo(dir_path);
-            var qu = dinfo.GetFiles(file_num + ".*");
-            if (qu.Length == 0) return NotFound();
+            System.IO.FileInfo[] qu = dinfo.GetFiles(file_num + ".*");
+            if (qu.Length == 0)
+            {
+                string beg = path.Substring(0, path.Length - 26);
+                string end = path.Substring(path.Length - 10);
+                path = beg + "originals" + end;
+
+                dir_path = path.Substring(0, path.Length - 5);
+                file_num = path.Substring(path.Length - 4);
+                dinfo = new System.IO.DirectoryInfo(dir_path);
+                qu = dinfo.GetFiles(file_num + ".*");
+                if (qu.Length == 0) return NotFound();
+            }
             int pos = qu[0].Name.LastIndexOf('.');
             if (pos == -1) return NotFound();
             string ext = qu[0].Name.Substring(pos + 1);
@@ -40,7 +52,8 @@ namespace MagBlazor.Controllers
         {
             string path = OAData.OADB.GetFilePath(u, null);
             if (path == null) return NotFound();
-            return PhysicalFile(path + ".pdf", "application/pdf");
+            var q = path.Replace("documents/normal", "originals");
+            return PhysicalFile(q + ".pdf", "application/pdf");
         }
 
     }
