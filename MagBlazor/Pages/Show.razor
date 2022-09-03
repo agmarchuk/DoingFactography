@@ -2,8 +2,10 @@
 @using RDFEngine;
 
 <h3>Show item @entityId</h3>
-<div>id: @erecord.Id</div>
-<div>type: @erecord.Tp</div>
+<div>id: @erecord?.Id</div>
+<div>type: @erecord?.Tp</div>
+@if (erecord != null)
+{
 <table border="1">
     @foreach (RProperty prop in erecord.Props)
     {
@@ -46,7 +48,7 @@
         }
     }
 </table>
-
+}
     @code {
         [Parameter]
         public string entityId { get; set; }

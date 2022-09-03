@@ -7,7 +7,63 @@ namespace ConsoleTransformer
 {
     class Program
     {
-        static void Main(string[] args)
+        // Читает фог-файл, убирает записи-дубли по критерию времени фиксации, записывает файл
+        static void Main()
+        {
+            Console.WriteLine("Start Fog corrector");
+            string path = @"D:\Home\FactographProjects\Marchuk_cassettes\Marchuk_common\originals\0001\0001.fog";
+            string path_out = @"D:\Home\FactographProjects\Marchuk_cassettes\Marchuk_common\0001.foe";
+            var xfog = XElement.Load(path);
+            Dictionary<string, DateTime> lastDTimes = new Dictionary<string, DateTime>();
+            foreach (var xrec in xfog.Elements())
+            {
+                string id = xrec.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about")?.Value;
+                if (id == null) continue;
+                string mT_str = xrec.Attribute("mT")?.Value;
+                DateTime mT = mT_str == null ? DateTime.MinValue : DateTime.Parse(mT_str);
+                if (lastDTimes.TryGetValue(id, out DateTime dt))
+                {
+                    if (mT > dt)
+                    {
+                        lastDTimes.Remove(id);
+                        lastDTimes.Add(id, mT);
+                    }
+                }
+                else
+                {
+                    lastDTimes.Add(id, mT);
+                }
+            }
+
+            // Формируемый коррекционный fog-документ
+            XElement corrections = XElement.Parse(
+@"<?xml version='1.0' encoding='utf-8'?>
+<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' xmlns='http://fogid.net/o/' >
+</rdf:RDF>");
+            corrections.Add(
+                xfog.Elements()
+                .Where(x =>
+                {
+                    string id = x.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about")?.Value;
+                    if (id == null) return true;
+                    string mT_str = x.Attribute("mT")?.Value;
+                    DateTime mT = mT_str == null ? DateTime.MinValue : DateTime.Parse(mT_str);
+                    if (lastDTimes.TryGetValue(id, out DateTime dt))
+                    {
+                        if (mT >= dt)
+                        {
+                            lastDTimes.Remove(id);
+                            lastDTimes.Add(id, mT);
+                            return true;
+                        }
+                        else return false;
+                    }
+                    return true;
+                })
+                .Select(x => new XElement(x)));
+            corrections.Save(path_out);
+        }
+        static void Main1(string[] args)
         {
             Console.WriteLine("Start ConsoleTransformer.");
             // Создаем базу данных через конфигуратор

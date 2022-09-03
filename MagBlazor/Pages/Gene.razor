@@ -80,6 +80,7 @@
     private GeneTreeModel BuildMidiPortrait(string id, GeneTreeModel parent_node)
     {
         RRecord record = (new RDFEngine.RXEngine()).GetRRecord(id, true);
+        if (record == null) return null;
         if (record.Tp != "http://fogid.net/o/person") throw new Exception("Err: 2229");
         RRecord spouse = null;
         foreach (RProperty p in record.Props)
@@ -112,6 +113,7 @@
     private void Build(string id)
     {
         GeneTreeModel gt_model = BuildMidiPortrait(id, null);
+        if (gt_model == null) return;
         focusrecord = gt_model.node;
         recordlevels = GeneTreeModel.Traverse(gt_model);
         // Предки 
