@@ -3,6 +3,7 @@
   <database dbname="photoarchive" connectionstring="xml:" />
 
   <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
-  <LoadCassette write="yes">D:\Home\FactographProjects\Cassette_test20180311</LoadCassette>
+  
+  <!--<LoadCassette write="yes">D:\Home\FactographProjects\Cassette_test20180311</LoadCassette>-->
 
 </config>

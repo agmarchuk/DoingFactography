@@ -81,7 +81,7 @@
     {
         RRecord record = (new RDFEngine.RXEngine()).GetRRecord(id, true);
         if (record == null) return null;
-        if (record.Tp != "http://fogid.net/o/person") throw new Exception("Err: 2229");
+        if (record.Tp != "http://fogid.net/o/person") throw new Exception("Err: 2229 Tp=" + record.Tp);
         RRecord spouse = null;
         foreach (RProperty p in record.Props)
         {

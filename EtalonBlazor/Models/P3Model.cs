@@ -67,7 +67,7 @@ namespace EtalonBlazor.Models
                     kd.GroupBy(d => d.IRec.Tp)
                         .Select(dd => {
                             var qu = dd.Select(x => x.IRec)
-                                .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = Infobase.rontology.ReorderFieldsDirects(rr) })
+                                .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = Infobase.rontology.ReorderFieldsDirects(rr, "ru") })
                                 .ToArray();
                             return new InverseType
                             {
@@ -81,7 +81,7 @@ namespace EtalonBlazor.Models
                 Id = erec.Id,
                 Tp = erec.Tp,
                 //row = erec.Props.Where(p => p is RField || p is RDirect).ToArray(),
-                row = Infobase.rontology.ReorderFieldsDirects(erec),
+                row = Infobase.rontology.ReorderFieldsDirects(erec, "ru"),
                 inv = query.ToArray()
             };
         }
