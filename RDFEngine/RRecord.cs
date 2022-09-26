@@ -80,6 +80,7 @@ namespace RDFEngine
             else
             {
                 name = ((RField)this.Props.FirstOrDefault(p => p is RField && p.Prop == REngine.propName));
+                if (name == null) return null;
                 var langName = (name.Lang == null) ? "ru" : name.Lang;
                 if (langName != lang)
                 {
@@ -176,6 +177,7 @@ namespace RDFEngine
         public string Value { get; set; }
         public string lang { get; set; }
     }
+
 
 
 

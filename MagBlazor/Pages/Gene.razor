@@ -57,10 +57,10 @@
         <div style="margin-left:@(otstup)px;">
             <MagBlazor.Components.ViewMidiPortrait record="@(rl.node)" />
             
-            @if (rl.spouse != null)
+            @foreach (var sp in rl.spouse)
             {
                 <img src="images/family.jpg" />
-                <MagBlazor.Components.ViewMidiPortrait record="@(rl.spouse)" />
+                <MagBlazor.Components.ViewMidiPortrait record="@(sp)" />
             }
         </div>
     }
@@ -82,7 +82,7 @@
         RRecord record = (new RDFEngine.RXEngine()).GetRRecord(id, true);
         if (record == null) return null;
         if (record.Tp != "http://fogid.net/o/person") throw new Exception("Err: 2229");
-        RRecord spouse = null;
+        List<RRecord> spouse = new List<RRecord>();
         foreach (RProperty p in record.Props)
         {
             if (p is RInverseLink)
@@ -91,12 +91,12 @@
                 if (ril.Prop == "http://fogid.net/o/husband")
                 {
                     RRecord family = (new RDFEngine.RXEngine()).GetRRecord(ril.Source);
-                    spouse = (new RDFEngine.RXEngine()).GetRRecord(family.GetDirectResource("http://fogid.net/o/wife"));
+                    spouse.Add((new RDFEngine.RXEngine()).GetRRecord(family.GetDirectResource("http://fogid.net/o/wife")));
                 }
                 if (ril.Prop == "http://fogid.net/o/wife")
                 {
                     RRecord family = (new RDFEngine.RXEngine()).GetRRecord(ril.Source);
-                    spouse = (new RDFEngine.RXEngine()).GetRRecord(family.GetDirectResource("http://fogid.net/o/husband"));
+                    spouse.Add((new RDFEngine.RXEngine()).GetRRecord(family.GetDirectResource("http://fogid.net/o/husband")));
                 }
 
             }
