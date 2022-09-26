@@ -10,7 +10,7 @@ namespace MagBlazor.Models
     {
         public int level;
         public RRecord node;
-        public RRecord spouse;
+        public List<RRecord> spouse;
         public GeneTreeModel parent;
         public GeneTreeModel[] childs; 
 

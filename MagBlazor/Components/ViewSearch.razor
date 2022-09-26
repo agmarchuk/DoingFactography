@@ -30,10 +30,29 @@
     foreach (RRecord rec in query)
     {
         string addrr = "view/" + rec.Id;
-        <div>
-            <NavLink href="@(addrr)">@Infobase.GetName(rec)</NavLink>
-            <span style="color:red;">@(Infobase.rontology.LabelOfOnto(rec.Tp))</span>
-        </div>
+        TRecord trec = new TRecord(rec.Id, Infobase.rontology);
+        string name = trec.GetName()?.Text;
+        var othernames = trec.GetNames().Where(n => n.Text != name)
+            .Select(t => t.Text)
+            .Concat(trec.GetMultiInverse("http://fogid.net/o/referred-sys")
+                .Select(na => na.GetText("http://fogid.net/o/alias").Text))
+            .Aggregate<string, string>("", (sum, t) => (sum==""?"":sum + "; ") + t)
+            ;
+        string dates = trec.GetDates();
+<div>
+    <span style="color:lightcoral;">@(Infobase.rontology.LabelOfOnto(rec.Tp))</span>
+    @* Что входит: ФИО, (дополнительные имена), даты, степени *@
+    <a href="@(addrr)" title="Лучшее &lt;h1&gt; место &lt;/h1&gt; для подсказки">@(name)</a>
+    @if (!string.IsNullOrEmpty(othernames))
+    {
+        <span>&nbsp;(@(othernames)) </span>
+    }
+    @if (!string.IsNullOrEmpty(dates))
+    {
+        <span>&nbsp;@dates</span>
+    }
+
+</div>
     }
     if (toedit && !string.IsNullOrEmpty(searchtype))
     {
