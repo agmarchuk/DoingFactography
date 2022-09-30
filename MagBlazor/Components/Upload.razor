@@ -8,6 +8,7 @@
 @using RDFEngine
 
 @inject IWebHostEnvironment Environment
+@inject OAData.IFactographDataService db
 
 @if (ActiveCassette(user) != null)
 {
@@ -18,9 +19,9 @@
     }
 }
 @if (look != null)
-            {
-                <span>Look: @look</span>
-            }
+{
+    <span>Look: @look</span>
+}
 
 @code {
     [Parameter]
@@ -171,7 +172,7 @@
             }
 
             // Порождаем движок
-            RDFEngine.IEngine engine = new RDFEngine.RXEngine() { User = user };
+            RDFEngine.IEngine engine = new RDFEngine.RYEngine(db) { User = user };
 
             // Конструируем документ и добавляем его в базу данных
             string doc_id = engine.NewRecord(tp, "noname");
@@ -185,7 +186,7 @@
                     new RField { Prop = "http://fogid.net/o/uri", Value = uri},
                     new RField { Prop = "http://fogid.net/o/docmetainfo", Value = fl.ContentType},
                     new RField { Prop = "http://fogid.net/o/from-date", Value = fromdate }
-                                }
+                                    }
             });
 
             // Связываем документ с объектом кассеты
@@ -196,7 +197,7 @@
                 {
                     new RLink { Prop = "http://fogid.net/o/in-collection", Resource = activecassetteId },
                     new RLink { Prop = "http://fogid.net/o/collection-item", Resource = doc_id }
-                                    }
+                                        }
             });
         }
 

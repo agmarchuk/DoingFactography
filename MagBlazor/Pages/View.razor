@@ -1,6 +1,7 @@
 ﻿@page "/view/{entityId?}/{eid?}"
 @using RDFEngine;
 @inject NavigationManager NavManager
+@inject OAData.IFactographDataService db
 
 @{
     string lnk = "edit/" + entityId;
@@ -42,7 +43,7 @@
     }
     private void Build(string id)
     {
-        RRecord record = (new RDFEngine.RXEngine() { User = user }).GetRRecord(id);
+        RRecord record = (new RDFEngine.RYEngine(db) { User = user }).GetRRecord(id);
         focusrecord = record;
     }
     protected override void OnInitialized() // = On Page Load

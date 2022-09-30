@@ -1,5 +1,6 @@
 ﻿@using RDFEngine
-@using MagBlazor.Models;
+@using MagBlazor.Models
+@inject OAData.IFactographDataService db
 
 @if (m == null) { return; }
 
@@ -454,11 +455,11 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
     {
         if (focusrecord != null)
         {
-            m = new RRecordTree(focusrecord.Id, Infobase.rontology);
+            m = new RRecordTree(focusrecord.Id, Infobase.rontology, new RYEngine(db));
             if (externalId != null)
             {
-                RRecord externalRec = (new RXEngine()).GetRRecord(externalId, true);
-                var rxobj = new RXEngine();
+                RRecord externalRec = (new RYEngine(db)).GetRRecord(externalId, true);
+                var rxobj = new RYEngine(db);
                 var docset = externalRec.Props
                     .Where(p => p is RInverseLink && p.Prop == "http://fogid.net/o/inDocument").Cast<RInverseLink>()
                     .Select(l =>
