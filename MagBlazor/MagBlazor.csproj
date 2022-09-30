@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\PortraitModel.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="Components\ViewPortrait2.razor" />
     <Content Remove="Components\ViewPortraitOrgsys.razor" />
     <Content Remove="Components\ViewPortraitPerson.razor" />

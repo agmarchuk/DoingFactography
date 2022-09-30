@@ -1,4 +1,5 @@
 ﻿@using RDFEngine;
+@inject OAData.IFactographDataService db;
 
 @{
     string sep = "";
@@ -34,7 +35,7 @@
 
     protected override void OnParametersSet()
     {
-        rtree = new RRecordTree(record.Id, Infobase.rontology);
+        rtree = new RRecordTree(record.Id, Infobase.rontology, new RYEngine(db));
 
         name = rtree.GetName();
         dates = rtree.GetDates();

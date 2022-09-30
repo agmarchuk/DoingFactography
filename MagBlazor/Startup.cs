@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OAData;
 
 namespace MagBlazor
 {
@@ -28,7 +29,8 @@ namespace MagBlazor
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<IFactographDataService, FactographDataService>();
+            //services.AddSingleton<WeatherForecastService>();
             services.AddHttpClient();
         }
 

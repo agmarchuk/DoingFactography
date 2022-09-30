@@ -4,14 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace RDFEngine
 {
     public class RRecordTree
     {
         private RRecord record = null;
-        public RRecordTree(string recId, ROntology rontology)
+        private RYEngine engine;
+        public RRecordTree(string recId, ROntology rontology, RYEngine engine)
         {
             this.rontology = rontology;
+            this.engine = engine;
             record = Do(recId, 2, null);
         }
         public string Id { get { return record.Id; } }
@@ -48,7 +51,7 @@ namespace RDFEngine
         private RRecord Do(string recId, int level, string forbidden)
         {
             // Если level = 0 - только поля, 1 - поля и прямые ссылки,  2 - поля, прямые ссылки и обратные ссылки
-            RRecord erec = (new RDFEngine.RXEngine()).GetRRecord(recId, level > 1);
+            RRecord erec = engine.GetRRecord(recId, level > 1);
             if (erec == null) return null;
             var tp = erec.Tp;
 

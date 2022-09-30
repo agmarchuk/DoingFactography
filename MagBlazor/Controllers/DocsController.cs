@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MagBlazor.Controllers
 {
     public class DocsController : Controller
     {
+        private readonly OAData.IFactographDataService db;
+        public DocsController(OAData.IFactographDataService db) { this.db = db; }
+
         [HttpGet("docs/GetImage")]
         public IActionResult GetImage(string u, string s)
         {
-            string path = OAData.OADB.GetFilePath(u, s);
+            string path = db.GetFilePath(u, s);
             if (!System.IO.File.Exists(path + ".jpg"))
             {
                 s = s == "medium" ? "normal" : "medium";
-                path = OAData.OADB.GetFilePath(u, s);
+                path = db.GetFilePath(u, s);
             }
             return PhysicalFile(path + ".jpg", "image/jpg");
         }
@@ -23,7 +22,7 @@ namespace MagBlazor.Controllers
         [HttpGet("docs/GetVideo")]
         public IActionResult GetVideo(string u)
         {
-            string path = OAData.OADB.GetFilePath(u, "medium");
+            string path = db.GetFilePath(u, "medium");
             if (path == null) return NotFound();
 
             string dir_path = path.Substring(0, path.Length - 5);
@@ -50,7 +49,7 @@ namespace MagBlazor.Controllers
         [HttpGet("docs/GetPdf")]
         public IActionResult GetPdf(string u)
         {
-            string path = OAData.OADB.GetFilePath(u, null);
+            string path = db.GetFilePath(u, null);
             if (path == null) return NotFound();
             var q = path.Replace("documents/normal", "originals");
             return PhysicalFile(q + ".pdf", "application/pdf");

@@ -16,11 +16,11 @@ namespace RDFEngine
     public class TRecord
     {
         private ROntology rontology;
-        public TRecord(string recId, ROntology rontology, int level = 2, string forbidden = null)
+        public TRecord(string recId, ROntology rontology, OAData.IFactographDataService db, int level = 2, string forbidden = null)
         {
             this.rontology = rontology;
             // Если level = 0 - только поля, 1 - поля и прямые ссылки,  2 - поля, прямые ссылки и обратные ссылки
-            RRecord erec = (new RDFEngine.RXEngine()).GetRRecord(recId, level > 1);
+            RRecord erec = (new RDFEngine.RYEngine(db)).GetRRecord(recId, level > 1);
             if (erec == null) return;
             Id = recId;
             Tp = erec.Tp;
@@ -69,7 +69,7 @@ namespace RDFEngine
                 {
                     // Буду фиксировать только первое значение p0
                     RLink lnk = (RLink)p0;
-                    t = new TDirect { PropId = p0.Prop, Record = new TRecord(lnk.Resource, rontology, level - 1, null) };
+                    t = new TDirect { PropId = p0.Prop, Record = new TRecord(lnk.Resource, rontology, db, level - 1, null) };
                 }
                 else if (level > 1 && p0 is RInverseLink)
                 {
@@ -78,7 +78,7 @@ namespace RDFEngine
                     {
                         PropId = p0.Prop,
                         Records = p_list.Cast<RInverseLink>()
-                            .Select(ri => new TRecord(ri.Source, rontology, level - 1, p0.Prop)).ToArray()
+                            .Select(ri => new TRecord(ri.Source, rontology, db, level - 1, p0.Prop)).ToArray()
                     };
                 }
                 props[ind] = t;
