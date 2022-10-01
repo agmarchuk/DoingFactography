@@ -6,7 +6,7 @@
 @using RDFEngine
 @inject ILogger<FileUpload1> Logger
 @inject IWebHostEnvironment Environment
-
+@inject OAData.IFactographDataService db
 
 <h3>Upload Files</h3>
 
@@ -98,7 +98,7 @@ else
         string user = "mag_9347";
 
         // Найдем активную кассету
-        var activecassette = OAData.OADB.cassettes.FirstOrDefault(c =>
+        var activecassette = db.Cassettes.FirstOrDefault(c =>
         {
             var q = c;
             return (c.owner == user && c.writable); }
