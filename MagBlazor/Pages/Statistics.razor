@@ -1,5 +1,5 @@
 ﻿@page "/statistics"
- 
+@inject OAData.IFactographDataService db 
 <button @onclick="Calculate">Push</button>
 <h3>Statistics</h3>
 <span>persons: @npersons  docs: @ndocs</span>
@@ -8,7 +8,7 @@
     private int npersons = 0, ndocs = 0;
     private void Calculate()
     {
-        var elements = OAData.OADB.GetAll();
+        var elements = db.GetAll();
         foreach (var el in elements)
         {
             if (el.Name.LocalName == "person") npersons++;

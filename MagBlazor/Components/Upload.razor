@@ -74,14 +74,14 @@
         prepared = true;
     }
 
-    private OAData.Adapters.CassInfo ActiveCassette(string usr) => OAData.OADB.cassettes.FirstOrDefault(c => (c.owner == usr && c.writable));
+    private OAData.Adapters.CassInfo ActiveCassette(string usr) => db.Cassettes.FirstOrDefault(c => (c.owner == usr && c.writable));
 
     // Фиксация загруженных файлов
     private void FixLoadedFiles()
     {
 
         // Найдем активную кассету
-        var activecassette = OAData.OADB.cassettes.FirstOrDefault(c =>
+        var activecassette = db.Cassettes.FirstOrDefault(c =>
         {
             var q = c;
             return (c.owner == user && c.writable);

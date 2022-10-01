@@ -132,7 +132,7 @@
     private string _user
     {
         get { return user; }
-        set { if (!string.IsNullOrEmpty(value) && OAData.OADB.HasWritabeFogForUser(value)) user = value; else user = null; }
+        set { if (!string.IsNullOrEmpty(value) && db.HasWritabeFogForUser(value)) user = value; else user = null; }
     }
     private string user;
     private string newid;
