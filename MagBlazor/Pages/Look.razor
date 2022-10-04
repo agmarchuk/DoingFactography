@@ -1,0 +1,27 @@
+﻿@page "/look/{entityId?}/{eid?}"
+@using RDFEngine;
+@inject OAData.IFactographDataService db
+
+<h3>Look @(entityId)</h3>
+<MagBlazor.Components.ViewSearch onSelected="@((rid) => UtilizeRecord((string)rid))" searchsample="@searchsample" typs="@tps" target="look" />
+
+@code {
+    [Parameter]
+    public string entityId { get; set; }
+
+    [Parameter]
+    public string eid { get; set; }
+
+    private string searchsample;
+    private string[] tps = new string[]
+    {
+        "http://fogid.net/o/person",
+        "http://fogid.net/o/org-sys",
+        "http://fogid.net/o/document",
+        "http://fogid.net/o/collection",
+        "http://fogid.net/o/photo-doc",
+        "http://fogid.net/o/video-doc",
+        //"http://fogid.net/o/",
+    };
+    private void UtilizeRecord(string id) => entityId = id;
+}

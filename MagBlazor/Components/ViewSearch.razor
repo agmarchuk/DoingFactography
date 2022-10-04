@@ -30,7 +30,7 @@
     if (!extended) { query = query.OrderBy(r => Infobase.GetName(r)); }
     foreach (RRecord rec in query)
     {
-        string addrr = "view/" + rec.Id;
+        string addrr = target +"/" + rec.Id;
         TRecord trec = new TRecord(rec.Id, Infobase.rontology, db);
         string name = trec.GetName()?.Text;
         var othernames = trec.GetNames().Where(n => n.Text != name)
@@ -69,7 +69,10 @@
     [Parameter]
     public string[] typs { get; set; }
     [Parameter]
+    public string target { get; set; }
+    [Parameter]
     public string user { get; set; }
+
     private bool toedit { get { return !string.IsNullOrEmpty(user); } }
     private bool extended = false;
 

@@ -12,6 +12,8 @@
     <Content Remove="Components\ViewPortrait2.razor" />
     <Content Remove="Components\ViewPortraitOrgsys.razor" />
     <Content Remove="Components\ViewPortraitPerson.razor" />
+    <Content Remove="Views\Home\Show.cshtml" />
+    <Content Remove="Views\Shared\Error.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +41,24 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Components\ViewPortraitOrgsys.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\Home\About.cshtml" />
+    <None Include="Views\Home\Contacts.cshtml" />
+    <None Include="Views\Home\ExtSearch.cshtml" />
+    <None Include="Views\Home\Index.cshtml" />
+    <None Include="Views\Home\PageUseLinks.cshtml" />
+    <None Include="Views\Home\Participants.cshtml" />
+    <None Include="Views\Home\PortraitCollection.cshtml" />
+    <None Include="Views\Home\PortraitDocument.cshtml" />
+    <None Include="Views\Home\PortraitGeo.cshtml" />
+    <None Include="Views\Home\PortraitOrg.cshtml" />
+    <None Include="Views\Home\PortraitPerson.cshtml" />
+    <None Include="Views\Home\Privacy.cshtml" />
+    <None Include="Views\Home\Search.cshtml" />
+    <None Include="Views\Shared\_Layout.cshtml" />
+    <None Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
   </ItemGroup>
 
 </Project>
