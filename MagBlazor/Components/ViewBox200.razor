@@ -1,0 +1,20 @@
+﻿@using RDFEngine;
+@inject OAData.IFactographDataService db;
+
+<div style="width:200px; height:200px; border:solid,thin;">
+
+</div>
+
+@code {
+    [Parameter]
+    public string recId { get; set; }
+
+    private TRecord trec;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        trec = new TRecord(recId, Infobase.rontology, db);
+
+    }
+}
