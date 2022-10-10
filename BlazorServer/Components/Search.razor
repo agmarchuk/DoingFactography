@@ -1,4 +1,5 @@
 ﻿@using RDFEngine
+@inject OAData.IFactographDataService db
 
 <div class="search-container">
     @if (blockTitle.Length != 0)
@@ -43,16 +44,16 @@
            
             if (!string.IsNullOrEmpty(selectedType) && selectedType != "all")
             {
-                query = Infobase.engine.RSearch(searchsample).Where(rec => rec.Tp == selectedType);
+                query = (new RDFEngine.RYEngine(db) { User = "mag_1" }).RSearch(searchsample).Where(rec => rec.Tp == selectedType);
             }
             else
             {
-                query = Infobase.engine.RSearch(searchsample).Where(rec => allowedTypes.Contains(rec.Tp));
+                query = (new RDFEngine.RYEngine(db) { User = "mag_1" }).RSearch(searchsample).Where(rec => allowedTypes.Contains(rec.Tp));
             }
         } 
         else
         {
-            query = ((RXEngine)Infobase.engine).RSearchByWords(searchsample);
+            query = (new RDFEngine.RYEngine(db) { User = "mag_1" }).RSearchByWords(searchsample);
         }
         foreach (RRecord rec in query)
         {

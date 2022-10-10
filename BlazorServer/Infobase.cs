@@ -21,16 +21,16 @@ namespace BlazorServer
         public static void Init(string path)
         {
 
-            OAData.OADB.Init(path);
+            //AData.OADB.Init(path);
             //var xel = OAData.OADB.GetItemByIdBasic("newspaper_28156_1997_1", false);
             //var xels = OAData.OADB.SearchByName("марчук").ToArray();
            // if (xel != null) Console.WriteLine(xel.ToString());
             //OAData.OADB.Load();
 
-            Infobase.engine = new RXEngine(); // Это новый движок!!!
+            //Infobase.engine = new RXEngine(); // Это новый движок!!!
 
             //user here
-            ((RXEngine)Infobase.engine).User = "mag_1";
+            //((RXEngine)Infobase.engine).User = "mag_1";
 
             //Infobase.engine.NewRecord("http://fogid.net/o/person", "Пупкин"); // Опробовал 1
             //string idd = OAData.OADB.SearchByName("пупкин").FirstOrDefault()?.Attribute("id")?.Value;

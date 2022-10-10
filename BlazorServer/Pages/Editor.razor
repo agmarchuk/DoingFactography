@@ -4,6 +4,7 @@
 @attribute [Authorize(Roles = "Admin,Editor")]
 @inject NavigationManager NavManager
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
+@inject OAData.IFactographDataService db
 
 
 @*<div><input type="checkbox" @bind="lookDb" /></div>*@
@@ -210,7 +211,7 @@
     private void BuildPortrait(string id)
     {
         eid = null;
-        RRecord rec = (Infobase.engine).BuildPortrait(id);
+        RRecord rec = (new RYEngine(db) { User = "mag_1" }).BuildPortrait(id);
         originalRecord = rec;
         parentTypes = ROntology.parentsDictionary[rec.Tp];
         model = (new Models.P3Model()).Build(rec);
@@ -296,7 +297,7 @@
 
     private void Delete(string id)
     {
-        ((RXEngine)Infobase.engine).DeleteRecord(id, userName);
+       (new RDFEngine.RYEngine(db) { User = "mag_1" }).DeleteRecord(id, userName);
     }
 
     private void Save(RRecord record)
@@ -308,7 +309,7 @@
             editFields = false;
         }
 
-        ((RXEngine)Infobase.engine).Update(record, userName);
+       (new RDFEngine.RYEngine(db) { User = "mag_1" }).Update(record, userName);
 
         addRecordType = null;
 
