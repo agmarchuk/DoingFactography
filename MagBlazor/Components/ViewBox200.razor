@@ -2,7 +2,9 @@
 @inject OAData.IFactographDataService db;
 
 <div style="width:200px; height:200px; border:solid,thin;">
-
+    <div style="font-size: small; text-align: center; height: 20px;">@tp</div>
+    <div style="font-size:large; text-align:center;">@name</div>
+    <div style="font-size: small; text-align: center; height: 20px;">@dt</div>
 </div>
 
 @code {
@@ -11,10 +13,15 @@
 
     private TRecord trec;
 
+    private string tp;
+    private string dt;
+    private string name;
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         trec = new TRecord(recId, Infobase.rontology, db);
-
+        tp = trec.Tp;
+        dt = trec.GetDates();
+        name = trec.GetName()?.Text;
     }
 }

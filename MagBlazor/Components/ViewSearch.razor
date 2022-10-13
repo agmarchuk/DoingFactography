@@ -59,6 +59,12 @@
     {
         <div><a href="javascript:void(0)" @onclick="@(e =>NewItemClick(searchtype))">нов.</a></div>
     }
+<div style="display: flex; flex-wrap: wrap;">
+    @foreach (RRecord rec in query)
+    {
+    <ViewBox200 recId="@rec.Id" />
+    }
+</div>
 }
 
 @code{
