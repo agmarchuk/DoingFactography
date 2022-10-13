@@ -19,8 +19,34 @@ namespace MagBlazor.OAModels
         public SpecialObjects (OAData.IFactographDataService db)
         {
             this.db = db;
-            //so = new SpecialObjects(db);
+
             _funds = new XElement[0];
+            XElement fondy = db.SearchByName("Фонды")
+                .FirstOrDefault(x => GetField(x, "http://fogid.net/o/name") == "Фонды");
+            if (fondy != null)
+            {
+                XElement format_funds_coll = new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
+        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
+            new XElement("record", new XAttribute("type", "http://fogid.net/o/collection-member"),
+                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
+                    new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
+                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/reflected"),
+                            new XElement("record", new XAttribute("type", "http://fogid.net/o/reflection"),
+                                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/in-doc"),
+                                    new XElement("record", new XAttribute("type", "http://fogid.net/o/photo-doc"),
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri")),
+                                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/forDocument"),
+                                            new XElement("record", new XAttribute("type", "http://fogid.net/o/FileStore"),
+                                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri"))))
+                                                )))),
+                        null)))));
+                funds_id = fondy.Attribute("id").Value;
+                XElement funds_coll = db.GetItemById(funds_id, format_funds_coll);
+                _funds = funds_coll.Elements("inverse")
+                    .Select((XElement inv) => inv.Element("record").Element("direct").Element("record")).ToArray();
+            }
         }
         private string funds_id = null;
         public string GetField(XElement rec, string prop)
