@@ -10,13 +10,21 @@ namespace BlazorServer.Controllers
 {
     public class ImageController : Controller
     {
+        private readonly OAData.IFactographDataService db;
+
+        public ImageController(OAData.IFactographDataService db)
+        {
+            this.db = db;
+        }
+
         [HttpGet("docs/GetImage")]
+
 
         public IActionResult GetImage(string u, string s)
         {
             if (u == null) return NotFound();
             u = System.Web.HttpUtility.UrlDecode(u);
-            var cass_dir = OAData.OADB.CassDirPath(u);
+            var cass_dir = (new RDFEngine.RYEngine(db) { User = "mag_1" }).CassDirPath(u);
             if (cass_dir == null) return NotFound();
             string[] last10 = u.Substring(u.Length - 10).Split("/");
             last10[last10.Length - 1] = last10[last10.Length - 1] + ".jpg";

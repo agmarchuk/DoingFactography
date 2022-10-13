@@ -481,3 +481,23 @@
   <comment xml:lang="en">comment 3123</comment>
   <comment>комм2</comment>
 </reflection>
+<person rdf:about="syp2001-p-marchuk_a" mT="2022-10-09 14:31:33Z" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://fogid.net/o/">
+  <name xml:lang="ru">Марчук Александр Гурьевич</name>
+  <name xml:lang="en">Marchuk Alexander</name>
+  <from-date>1951-12-30</from-date>
+  <birth>1951-12-30</birth>
+  <to-date>213</to-date>
+  <sex>m</sex>
+  <description xml:lang="en">123</description>
+  <comment xml:lang="en">test</comment>
+  <description xml:lang="ru">555</description>
+  <comment xml:lang="ru">000</comment>
+  <father rdf:resource="syp2002-p-39" />
+</person>
+<reflection rdf:about="ref1449" mT="2022-10-10 11:04:35Z" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://fogid.net/o/">
+  <reflected rdf:resource="syp2001-p-marchuk_a" />
+  <in-doc rdf:resource="syp2007_col_otdyh2007_pd_101" />
+  <comment xml:lang="ru">комм2234</comment>
+  <comment xml:lang="en">comment 3123</comment>
+  <comment>комм2</comment>
+</reflection>

@@ -1,4 +1,5 @@
 ﻿@using RDFEngine
+@inject OAData.IFactographDataService db
 
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
 
@@ -22,7 +23,7 @@
     var defrowProps = defrow.Props.Where(prop => prop is RLink).ToArray();
     recToAdd.Props = new RProperty[defrowProps.Length];
     recToAdd.Tp = new String(defrow.Id);
-    recToAdd.Id = ((RXEngine) Infobase.engine).NewRelation(recToAdd.Tp, forbidden, origId, userName);
+    recToAdd.Id = (new RDFEngine.RYEngine(db) { User = "mag_1" }).NewRelation(recToAdd.Tp, forbidden, origId, userName);
     for (int i = 0; i < defrowProps.Length; i++)
     {
         RLink c = (RLink)defrowProps[i];
@@ -38,7 +39,7 @@
             recToAdd.Props[i].Prop = c.Resource;
             if (c.Resource == forbidden)
             {
-                ((RDirect)recToAdd.Props[i]).DRec = Infobase.engine.GetRRecord(origId);
+                ((RDirect)recToAdd.Props[i]).DRec =  (new RDFEngine.RYEngine(db) { User = "mag_1" }).GetRRecord(origId);
             }
             else
             {
@@ -54,7 +55,7 @@ else
 {
     if (forbidden != null && !addRecord)
     {
-        ((RDirect)r.Props.FirstOrDefault(prop => prop.Prop == forbidden)).DRec = Infobase.engine.GetRRecord(origId);
+        ((RDirect)r.Props.FirstOrDefault(prop => prop.Prop == forbidden)).DRec =  (new RDFEngine.RYEngine(db) { User = "mag_1" }).GetRRecord(origId);
 
     }
 }

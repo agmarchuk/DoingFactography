@@ -58,8 +58,6 @@
 else if (!string.IsNullOrEmpty(m.uri) && m.contenttype != null && m.contenttype.StartsWith("image/"))
 {
     string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetImage?s=normal&u=" + m.uri;
-    //string sr = (SObjects.Engine.DaraSrc == null ? "~" :
-    //    SObjects.Engine.DaraSrc) + "/Docs/GetPhoto?s=medium&u=" + m.uri;
 
     <img src="@Url.Content(sr)" />
 }
@@ -97,7 +95,7 @@ else if (!string.IsNullOrEmpty(m.uri) && m.contenttype != null && m.contenttype.
 
                     if (uri.StartsWith("iiss://"))
                     {
-                        string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetPhoto?s=small&u=" + uri;
+                        string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetImage?s=small&u=" + uri;
                         <div class="show-small">
                             <a href="~/Home/Portrait?id=@idd&eid=@m.id">
                                 @*<img src="@Url.Content(sr)" border="0" vspace="10" hspace="10" alt="" />*@

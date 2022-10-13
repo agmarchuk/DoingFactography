@@ -254,6 +254,11 @@ namespace RDFEngine
             Update(record, null);
         }
 
+        public string CassDirPath(string u)
+        {
+            return fservice.CassDirPath(u);
+        }
+
         public void Update(RRecord record, string user)
         {
             var xres = new XElement(ToXName(record.Tp),

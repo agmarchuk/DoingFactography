@@ -49,7 +49,7 @@
         }
         else if (documenttype.StartsWith("image/"))
         {
-            string src = url == null ? Url.Content("~/Docs/GetPhoto?u=" + uri_coded + "&amp;s=medium") : url;
+            string src = url == null ? Url.Content("~/Docs/GetImage?u=" + uri_coded + "&amp;s=medium") : url;
             <img src="@src" />
         }
         <div>@documenttype</div>
@@ -107,7 +107,7 @@
                                     ?.Substring(13);
                                 if (doctype.StartsWith("image/"))
                                 {
-                                    <img src="~/Docs/GetPhoto?s=small&amp;u=@(u)" align="right" />
+                                    <img src="~/Docs/GetImage?s=small&amp;u=@(u)" align="right" />
                                 }
                                 //else if (doctype == "application.pdf") {  }
                                 else

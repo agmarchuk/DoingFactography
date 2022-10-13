@@ -2,6 +2,7 @@
 @using RDFEngine
 @using BlazorServer.Components
 @inject NavigationManager NavManager
+@inject OAData.IFactographDataService db
 
 @*<div><input type="checkbox" @bind="lookDb" /></div>*@
 <h3>Просмотрщик</h3>
@@ -145,7 +146,7 @@
     private RRecord[] ont = Infobase.ront.rontology;
     private void BuildPortrait(string id)
     {
-        RRecord rec = (Infobase.engine).BuildPortrait(id);
+        RRecord rec = (new RDFEngine.RYEngine(db) { User = "mag_1" }).BuildPortrait(id);
         originalRecord = rec;
         parentTypes = ROntology.parentsDictionary[rec.Tp];
         model = (new Models.P3Model()).Build(rec);
