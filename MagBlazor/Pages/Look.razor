@@ -1,9 +1,79 @@
 ﻿@page "/look/{entityId?}/{eid?}"
 @using RDFEngine;
+@using MagBlazor.Components;
 @inject OAData.IFactographDataService db
 
-<h3>Look @(entityId)</h3>
 <MagBlazor.Components.ViewSearch onSelected="@((rid) => UtilizeRecord((string)rid))" searchsample="@searchsample" typs="@tps" target="look" />
+<div style="font-size:small;">@(RDFEngine.Infobase.rontology.LabelOfOnto(trec.Tp))</div>
+@if (reflectedfoto != null)
+{
+    string uri = reflectedfoto.GetDirect("http://fogid.net/o/in-doc")
+            ?.GetText("http://fogid.net/o/uri").Text;
+    <figure>
+        <img src="docs/GetImage?s=small&u=@(uri)" style="float:left; margin-right:10px;" />
+    </figure>
+}
+<div>
+    <p>
+        <span style="font-size:large;">
+            @name
+        </span>
+        @if (!string.IsNullOrEmpty(othernames))
+        {
+            <span class="norma">&nbsp;(@othernames)</span>
+        }
+    </p>
+    @if (!string.IsNullOrEmpty(dates))
+    {
+        <p class="norma">@dates</p>
+    }
+    <p>
+        @foreach (var title in titles)
+        {
+            <span class="norma">&nbsp;@title.GetText("http://fogid.net/o/degree").Text</span>
+        }
+    </p>
+    <p>
+        @if (!string.IsNullOrEmpty(description))
+        {
+            <span class="norma">&nbsp;@description</span>
+        }
+    </p>
+</div>
+
+@if (family != null)
+{
+    <div class="heading3">
+        <h3>Семья</h3>
+    </div>
+    <div style="display: flex; flex-wrap: wrap;">
+        @foreach (var fa in family)
+        {
+            string spec = "unknown";
+            TProperty p = fa.p;
+            TRecord rr = fa.r;
+            TRecord r = rr;
+            if (p is TDirect) spec = p.PropId == "http://fogid.net/o/father" ? "Отец" : "Мать";
+            else if (p is TInverse && (p.PropId == "http://fogid.net/o/father" || p.PropId == "http://fogid.net/o/mother"))
+            {
+                spec = "Ребенок";
+            }
+            else if (p is TInverse && (p.PropId == "http://fogid.net/o/husband" || p.PropId == "http://fogid.net/o/wife"))
+            {
+                string ge = p.PropId == "http://fogid.net/o/husband" ? "m" : "f";
+                spec = "Супруг" + (ge == "m" ? "а" : "");
+                // Даты супружества
+                string famdates = rr.GetDates();
+                if (!string.IsNullOrEmpty(famdates)) spec += " [" + famdates + "]";
+                string d = ge == "f" ? "http://fogid.net/o/husband" : "http://fogid.net/o/wife";
+                r = rr.GetDirect(d);
+            }
+
+            <MagBlazor.Components.ViewBox200 recId="@(r.Id)" prolog="@spec" />
+
+        }
+    </div>
+}
 
 @code {
     [Parameter]
@@ -21,7 +91,86 @@
         "http://fogid.net/o/collection",
         "http://fogid.net/o/photo-doc",
         "http://fogid.net/o/video-doc",
-        //"http://fogid.net/o/",
-    };
-    private void UtilizeRecord(string id) => entityId = id;
+            //"http://fogid.net/o/",
+        };
+
+    private TRecord trec;
+    private string name;
+    private string othernames;
+    private string dates;
+    struct PR // Пара свойство-одиночная запись
+    {
+        public TProperty p { get; set; }
+        public TRecord r { get; set; }
+    }
+    private PR[] family = new PR[0];
+    private TRecord reflectedfoto = null;
+    private TRecord[] reflections = new TRecord[0];
+    private string description = null;
+    private TRecord[] titles = null;
+
+    private void UtilizeRecord(string id)
+    {
+        entityId = id;
+        trec = new TRecord(id, RDFEngine.Infobase.rontology, db);
+        name = trec.GetName()?.Text;
+        othernames = trec.GetNames().Where(n => n.Text != name)
+            .Select(t => t.Text)
+            .Concat(trec.GetMultiInverse("http://fogid.net/o/referred-sys")
+                .Select(na => na.GetText("http://fogid.net/o/alias").Text))
+            .Aggregate<string, string>("", (sum, t) => (sum == "" ? "" : sum + "; ") + t)
+            ;
+        dates = trec.GetDates();
+        description = trec.GetText("http://fogid.net/o/description")?.Text;
+        titles = trec.GetMultiInverse("http://fogid.net/o/has-title").ToArray();
+
+        if (trec.Tp == "http://fogid.net/o/person")
+        {
+            // Преобразуем поток Т-свойств в поток пар PR
+            family = trec.Props
+                .SelectMany<TProperty, PR>(p =>
+                {
+                    if (p is TDirect)
+                    {
+                        TDirect p1 = (TDirect)p;
+                        if (p.PropId == "http://fogid.net/o/father" || p.PropId == "http://fogid.net/o/mother")
+                        {
+                            PR pair = new PR() { p = p1, r = p1.Record };
+                            return new PR[] { pair };
+                        }
+                    }
+                    else if (p is TInverse)
+                    {
+                        TInverse p2 = (TInverse)p;
+                        if (p.PropId == "http://fogid.net/o/father" || p.PropId == "http://fogid.net/o/mother")
+                        {
+                            return p2.Records.Select(r => new PR() { p = p2, r = r }).ToArray();
+                        }
+                        else if (p.PropId == "http://fogid.net/o/husband" || p.PropId == "http://fogid.net/o/wife")
+                        {
+                            return p2.Records.Select(r => new PR() { p = p2, r = r }).ToArray();
+                        }
+                    }
+                    return new PR[0];
+                })
+                .OrderBy(pr => (pr.p is TDirect ? 1 :
+                    (pr.p.PropId == "http://fogid.net/o/husband" || pr.p.PropId == "http://fogid.net/o/wife") ? 2 : 3))
+                .ToArray();
+        }
+        reflections = trec.GetMultiInverse("http://fogid.net/o/reflected").ToArray();
+        reflectedfoto = reflections.Where(r => r.GetText("http://fogid.net/o/ground")?.Text == "official")
+            .Where(r =>
+            {
+                var doc = r.GetDirect("http://fogid.net/o/in-doc");
+                if (doc.Tp == "http://fogid.net/o/photo-doc") return true;
+                return false;
+            })
+            .FirstOrDefault();
+    }
+
+    protected override void OnParametersSet()
+    {
+        //base.OnParametersSet();
+        if (entityId != null) UtilizeRecord(entityId);
+    }
 }

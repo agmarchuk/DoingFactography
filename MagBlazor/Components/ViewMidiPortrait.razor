@@ -35,7 +35,7 @@
 
     protected override void OnParametersSet()
     {
-        rtree = new RRecordTree(record.Id, Infobase.rontology, new RYEngine(db));
+        rtree = new RRecordTree(record.Id, RDFEngine.Infobase.rontology, new RYEngine(db));
 
         name = rtree.GetName();
         dates = rtree.GetDates();

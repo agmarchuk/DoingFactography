@@ -137,8 +137,14 @@ a.dotlink:hover, a.dotlink:active
 .small
 	{  text-align: left; font-size: 12px; line-height: 18px; }
 
-.norma
-	{  text-align: left; font-size: 14px; line-height: 18px; }
+.norma {
+	text-align: left;
+	font-size: 14px;
+	line-height: 18px;
+	font-style: normal;
+	color: black;
+	font-family: arial, sans-serif;
+}
 
 
 

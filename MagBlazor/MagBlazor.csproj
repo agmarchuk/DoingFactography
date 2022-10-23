@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Infobase.cs" />
     <Compile Remove="Models\PortraitModel.cs" />
   </ItemGroup>
 

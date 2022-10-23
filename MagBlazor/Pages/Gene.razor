@@ -29,12 +29,12 @@
     query = query.Where(r => r.Tp == "http://fogid.net/o/person");
     // Убрать дубли
     query = query.Distinct(new RRecordComparer());
-    if (!extended) { query = query.OrderBy(r => Infobase.GetName(r)); }
+    if (!extended) { query = query.OrderBy(r => RDFEngine.Infobase.GetName(r)); }
     query = query.ToArray();
     foreach (RRecord rec in query)
     {
         <div>
-            <a href="javascript:void(0)" @onclick="@(e =>SearchResultClick(rec))">@Infobase.GetName(rec)</a>
+            <a href="javascript:void(0)" @onclick="@(e =>SearchResultClick(rec))">@RDFEngine.Infobase.GetName(rec)</a>
         </div>
     }
 }
@@ -119,7 +119,7 @@
         focusrecord = gt_model.node;
         recordlevels = GeneTreeModel.Traverse(gt_model);
         // Предки
-        var rtree = new RRecordTree(recordlevels[0].node.Id, Infobase.rontology, new RYEngine(db));
+        var rtree = new RRecordTree(recordlevels[0].node.Id, RDFEngine.Infobase.rontology, new RYEngine(db));
         fm = rtree.GetDirect("http://fogid.net/o/father");
         if (fm == null) fm = rtree.GetDirect("http://fogid.net/o/mother");
 
