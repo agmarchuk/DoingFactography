@@ -94,6 +94,7 @@ namespace RDFEngine
         //   TDirect { propId, TRecord }
         //   TInverse { propId, TRecord[] } -- В обратных записях нет прямой ссылки с propId  
         private TProperty[] props;
+        public TProperty[] Props { get { return props; } }
 
         public IEnumerable<LangText> GetTexts(string propId)
         {
@@ -135,11 +136,30 @@ namespace RDFEngine
         public LangText GetName(string lang) => GetLangText("http://fogid.net/o/name", lang);
         public LangText GetName() => GetText("http://fogid.net/o/name");
 
+        private static readonly string[] months = new[] { "янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек" };
+        public static string DatePrinted(string date)
+        {
+            if (date == null) return null;
+            string[] split = date.Split('-');
+            string str = split[0];
+            if (split.Length > 1)
+            {
+                int month;
+                if (Int32.TryParse(split[1], out month) && month > 0 && month <= 12)
+                {
+                    str += months[month - 1];
+                    if (split.Length > 2) str += split[2].Substring(0, 2);
+                }
+            }
+            return str;
+        }
+
         public string GetDates()
         {
             string fd = GetText("http://fogid.net/o/from-date")?.Text;
             string td = GetText("http://fogid.net/o/to-date")?.Text;
-            return "" + fd ?? "" + (td == null ? "" : "-" + td);
+            return (string.IsNullOrEmpty(fd) ? "" : DatePrinted(fd)) +
+                (string.IsNullOrEmpty(td) ? "" : " - " + DatePrinted(td));
         }
         public string GetLabel(string ontoTerm) => rontology.LabelOfOnto(ontoTerm);
         public TRecord GetDirect(string propId)

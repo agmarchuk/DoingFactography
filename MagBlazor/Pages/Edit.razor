@@ -88,20 +88,20 @@
         {
 
             <MagBlazor.Components.DrawTable focusId="@focusRec.Id" inverseTp="@focusRec.Tp" records="@(new RRecord[] { focusRec })" onGo="(id) => Build((string)id)" user="@user" />
-            var list2 = Infobase.rontology.AncestorsAndSelf(focusRec.Tp).SelectMany(t => Infobase.rontology.GetInversePropsByType(t)).Distinct();
+            var list2 = RDFEngine.Infobase.rontology.AncestorsAndSelf(focusRec.Tp).SelectMany(t => RDFEngine.Infobase.rontology.GetInversePropsByType(t)).Distinct();
             foreach (var propName in list2)
             {
                 var pr = focusInversePropTypes.FirstOrDefault(ipt => ipt.Prop == propName);
-                foreach (var typ in Infobase.rontology.DomainsOfProp(propName))
+                foreach (var typ in RDFEngine.Infobase.rontology.DomainsOfProp(propName))
                 {
                     var it = pr == null ? null : pr.lists.FirstOrDefault(x => x.Tp == typ);
                     if (it == null)
                     {
                         if (toedit)
                         {
-                            <span>@(Infobase.rontology.InvLabelOfOnto(propName)) &nbsp;</span>
+                            <span>@(RDFEngine.Infobase.rontology.InvLabelOfOnto(propName)) &nbsp;</span>
                             <span>
-                                <a href="javascript:void(0)" @onclick="@(e => BuildInverseTable(propName, typ))">@(Infobase.rontology.LabelOfOnto(typ))</a> |
+                                <a href="javascript:void(0)" @onclick="@(e => BuildInverseTable(propName, typ))">@(RDFEngine.Infobase.rontology.LabelOfOnto(typ))</a> |
                             </span>
                         }
                     }
@@ -109,7 +109,7 @@
                     {
                         <table border="1">
                             <tr valign="top">
-                                <td>@(Infobase.rontology.InvLabelOfOnto(propName))</td>
+                                <td>@(RDFEngine.Infobase.rontology.InvLabelOfOnto(propName))</td>
                                 <td>
                                     <MagBlazor.Components.DrawTable focusId="@focusRec.Id" inverseProp="@propName" inverseTp="@typ" records="@(it==null?null:it.list)" onGo="(id) => Build((string)id)" user="@user" />
                                 </td>
@@ -141,7 +141,7 @@
         if (entityId != null && newid != null)
         {
             (new RYEngine(db)).Substitute(entityId, newid, _user);
-            Infobase.Reload();
+            RDFEngine.Infobase.Reload();
             entityId = newid;
             newid = null;
             Build(entityId);
@@ -152,7 +152,7 @@
     private bool toedit { get { return !string.IsNullOrEmpty(user); } }
 
     private string[] tps = //new string[] { "http://fogid.net/o/person", "http://fogid.net/o/org-sys" };
-        Infobase.rontology.DescendantsAndSelf("http://fogid.net/o/sys-obj").ToArray();
+        RDFEngine.Infobase.rontology.DescendantsAndSelf("http://fogid.net/o/sys-obj").ToArray();
 
     private string searchsample = "";
     // Запись фокусного элемента и списки обратных свойств для него
@@ -170,7 +170,7 @@
     private void Build(string recId)
     {
         prev = null; next = null; externalId = null;
-        RRecord erec = (new RDFEngine.RYEngine(db) { User = user }).BuildPortrait(recId); // ((REngine)(Infobase.engine)).BuildPortrait(recId);
+        RRecord erec = (new RDFEngine.RYEngine(db) { User = user }).BuildPortrait(recId); 
         if (erec == null)
         {
             focusRec = null;
@@ -187,7 +187,7 @@
             .Select(dd =>
             {
                 var qu = dd.Select(x => x.IRec)
-                    .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = Infobase.rontology.ReorderFieldsDirects(rr, "ru") })
+                    .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = RDFEngine.Infobase.rontology.ReorderFieldsDirects(rr, "ru") })
                     .ToArray();
                 return new Models.InverseType
                 {
@@ -197,7 +197,7 @@
             }).ToArray()
     }).ToArray();
         focusInversePropTypes = query;
-        focusRec = new RRecord { Id = erec.Id, Tp = erec.Tp, Props = Infobase.rontology.ReorderFieldsDirects(erec, "ru") };
+        focusRec = new RRecord { Id = erec.Id, Tp = erec.Tp, Props = RDFEngine.Infobase.rontology.ReorderFieldsDirects(erec, "ru") };
         entityId = recId;
 
         // ======== Вычисление полоски ==========

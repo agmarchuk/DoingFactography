@@ -54,7 +54,7 @@ namespace MagBlazor
             app.UseRouting();
 
             // Инициирование объектов Infobase
-            Infobase.Init(env.ContentRootPath + "/wwwroot/");
+            RDFEngine.Infobase.Init(env.ContentRootPath + "/wwwroot/");
 
             app.UseEndpoints(endpoints =>
             {

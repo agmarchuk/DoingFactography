@@ -12,7 +12,7 @@ else
     <table border="1">
         <tr>
             <td colspan="@(rowlength)">
-                <span style="color:red;">@(Infobase.rontology.LabelOfOnto(inverseTp))</span>
+                <span style="color:red;">@(RDFEngine.Infobase.rontology.LabelOfOnto(inverseTp))</span>
                 @if (inverseProp == null)
                 {
                     <span>&nbsp; @focusId</span>
@@ -26,7 +26,7 @@ else
         <tr valign="top" style="background-color:lightgray; font-size:smaller; font-weight: bold;">
             @foreach (var c in defrow.Props.Where(p => Allowed(p.Prop, inverseProp)))
             {
-                <td>@(Infobase.rontology.LabelOfOnto(c.Prop))</td>
+                <td>@(RDFEngine.Infobase.rontology.LabelOfOnto(c.Prop))</td>
             }
             @if (toedit)
             {
@@ -44,14 +44,14 @@ else
                             @foreach (var c in erecord.Props.Where(p => Allowed(p.Prop, inverseProp)))
                             {
                                 <tr>
-                                    <td>@(Infobase.rontology.LabelOfOnto(c.Prop))</td>
+                                    <td>@(RDFEngine.Infobase.rontology.LabelOfOnto(c.Prop))</td>
                                     @if (c is RField)
                                     {
                                         RField f = (RField)c;
                                         // ~~~~~~~~~~~~ выделяем вариант перечислимого и создаем под него элемент ~~~~~~
-                                        if (Infobase.rontology.IsEnumeration(c.Prop))
+                                        if (RDFEngine.Infobase.rontology.IsEnumeration(c.Prop))
                                         {
-                                            var states = Infobase.rontology.EnumPairs(c.Prop, "ru");
+                                            var states = RDFEngine.Infobase.rontology.EnumPairs(c.Prop, "ru");
                                             <td>
                                                 <select @onchange="@(e => SelectChangeHandler(e.Value, c))">
                                                     <option value=""></option>
@@ -83,7 +83,7 @@ else
                                         if (rr != null)
                                         {
                                             <td>
-                                                <a href="javascript:void(0)" @onclick="@(e =>LinkClick(rr.Id))">@(Infobase.GetName(rr))</a>
+                                                <a href="javascript:void(0)" @onclick="@(e =>LinkClick(rr.Id))">@(RDFEngine.Infobase.GetName(rr))</a>
                                                 &nbsp;
                                                 <a href="javascript:void(0)" @onclick="@(e => DeleteLink(c.Prop))">x</a>
                                             </td>
@@ -92,8 +92,8 @@ else
                                         {
                                             if (searchlinkprop == c.Prop)
                                             {
-                                                var typps = Infobase.rontology.RangesOfProp(c.Prop)
-                                                    .SelectMany(t => Infobase.rontology.DescendantsAndSelf(t))
+                                                var typps = RDFEngine.Infobase.rontology.RangesOfProp(c.Prop)
+                                                    .SelectMany(t => RDFEngine.Infobase.rontology.DescendantsAndSelf(t))
                                                     .Distinct();
                                                 <td style="background-color: antiquewhite;">
                                                     <MagBlazor.Components.Search onSelected="(rid) => LinkRecord((string)rid)"
@@ -131,9 +131,9 @@ else
                         {
                             string val = ((RField)c).Value;
                             <!-- ~~~~~~~~~~~ Вариант перечислимого  ~~~~~~~~~~~-->
-                            if (!string.IsNullOrEmpty(val) && Infobase.rontology.IsEnumeration(c.Prop))
+                            if (!string.IsNullOrEmpty(val) && RDFEngine.Infobase.rontology.IsEnumeration(c.Prop))
                             {
-                                val = Infobase.rontology.EnumValue(c.Prop, val, "ru");
+                                val = RDFEngine.Infobase.rontology.EnumValue(c.Prop, val, "ru");
                             }
                             if (isinversesysobj && c.Prop == "http://fogid.net/o/name")
                             {
@@ -150,39 +150,29 @@ else
 
                             if (rr != null)
                             {
-                                <td>
-                                    @*<a href="javascript:void(0)" @onclick="@(e =>LinkClick(rr.Id))">
-                                            @if (rr.Tp == "http://fogid.net/o/photo-doc")
-                                            {
-                                                string sr = "docs/GetImage?u=" + ((RField)rr.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri"))?.Value + "&s=small";
-                                                <img src="@sr" />
-                                            }
-                                            else
-                                            {
-                                                @(Infobase.GetName(rr))
-                                            }
-                                        </a>*@
-                                    @{
-                                        string lnk = "edit/" + rr.Id;
-                                        if (r != null &&
-                                            ((r.Tp == "http://fogid.net/o/DocumentPart" &&
-                                            c.Prop == "http://fogid.net/o/partItem") ||
-                                            (r.Tp == "http://fogid.net/o/collection-member" &&
-                                            c.Prop == "http://fogid.net/o/collection-item"))
-                                            ) lnk += "/" + focusId;
-                                    }
-                                    <a href="@lnk">
-                                        @if (rr.Tp == "http://fogid.net/o/photo-doc")
-                                        {
-                                            string sr = "docs/GetImage?u=" + ((RField)rr.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri"))?.Value + "&s=small";
-                                            <img src="@sr" />
-                                        }
-                                        else
-                                        {
-                                            @(Infobase.GetName(rr))
-                                        }
-                                    </a>
-                                </td>
+            <td>
+                
+                @{
+                    string lnk = "edit/" + rr.Id;
+                    if (r != null &&
+                        ((r.Tp == "http://fogid.net/o/DocumentPart" &&
+                        c.Prop == "http://fogid.net/o/partItem") ||
+                        (r.Tp == "http://fogid.net/o/collection-member" &&
+                        c.Prop == "http://fogid.net/o/collection-item"))
+                        ) lnk += "/" + focusId;
+                }
+                <a href="@lnk">
+                    @if (rr.Tp == "http://fogid.net/o/photo-doc")
+                    {
+                        string sr = "docs/GetImage?u=" + ((RField)rr.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri"))?.Value + "&s=small";
+                        <img src="@sr" />
+                    }
+                    else
+                    {
+                        @(RDFEngine.Infobase.GetName(rr))
+                    }
+                </a>
+            </td>
                             }
                             else
                             {

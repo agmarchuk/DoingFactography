@@ -717,6 +717,8 @@
     <range rdf:resource="http://fogid.net/o/personage-ground"/>
   </DatatypeProperty>
   <EnumerationType rdf:about="http://fogid.net/o/personage-ground">
+    <state value="official" xml:lang="ru">официальный</state>
+    <state value="official" xml:lang="en">official</state>
     <state value="portrait" xml:lang="ru">портрет</state>
     <state value="portrait" xml:lang="en">portrait</state>
     <state value="foreground" xml:lang="ru">первый план</state>

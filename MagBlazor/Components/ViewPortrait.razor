@@ -95,7 +95,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                 {
                     string date = dating.GetField("http://fogid.net/o/date");
                     string dspec = dating.GetField("http://fogid.net/o/dating-specificator");
-                    string ds = Infobase.rontology.EnumValue("http://fogid.net/o/dating-specificator", dspec, "ru");
+                    string ds = RDFEngine.Infobase.rontology.EnumValue("http://fogid.net/o/dating-specificator", dspec, "ru");
                     string accuracy = dating.GetField("http://fogid.net/o/dating-accuracy");
                     <span>@date &nbsp; @ds  &nbsp; @accuracy</span><br />
                 }
@@ -371,7 +371,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
                 string dt = doc.GetField("http://fogid.net/o/from-date");
                 string lnk = "view/" + doc.Id;
                 string asp = authority.GetField("http://fogid.net/o/authority-specificator");
-                string val = Infobase.rontology.EnumValue("http://fogid.net/o/authority-specificator", asp, "ru");
+                string val = RDFEngine.Infobase.rontology.EnumValue("http://fogid.net/o/authority-specificator", asp, "ru");
                 <tr valign="top">
                     <td width="15%">@dt</td>
                     <td width="65%">
@@ -455,7 +455,7 @@ else if (!string.IsNullOrEmpty(uri) && m.Tp == "http://fogid.net/o/video-doc")
     {
         if (focusrecord != null)
         {
-            m = new RRecordTree(focusrecord.Id, Infobase.rontology, new RYEngine(db));
+            m = new RRecordTree(focusrecord.Id, RDFEngine.Infobase.rontology, new RYEngine(db));
             if (externalId != null)
             {
                 RRecord externalRec = (new RYEngine(db)).GetRRecord(externalId, true);

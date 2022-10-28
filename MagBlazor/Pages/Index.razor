@@ -2,21 +2,34 @@
 @inject OAData.IFactographDataService db
 
 <div style="font-size:large;">
-    <NavLink href="gene/famwf1233_1001">Марчук Г.И.</NavLink> |
+    <NavLink href="look/famwf1233_1001">look Марчук Г.И.</NavLink> |
+    <NavLink href="gene/famwf1233_1001">gene Марчук Г.И.</NavLink> |
     <NavLink href="gene">Родословная</NavLink> |
     <NavLink href="view/cassetterootcollection">Кассеты с документами</NavLink> |
 
     <NavLink href="view">Просмотр</NavLink> |
     <NavLink href="edit">Редактирование</NavLink>
+    <span>@loook</span>
+    <button @onclick="Reloa">Reload @(sw.ElapsedMilliseconds)</button>
 </div>
 @*<div style="font-size:large;">
         <a href="/combine">Отождествление и слияние</a>
     </div>*@
 
 @code{      
+
+    private System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+    private string loook = "";
+    private void Reloa()
+    {
+        sw.Restart();
+        db.Reload();
+        sw.Stop();
+    }
     protected override void OnInitialized()
     {
         //var db = fservice;
+        loook = ((OAData.FactographDataService)db).look;
     }
     protected override void OnParametersSet()
     {

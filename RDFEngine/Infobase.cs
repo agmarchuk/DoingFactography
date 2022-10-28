@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using RDFEngine;
 
-namespace MagBlazor
+namespace RDFEngine
 {
     public class Infobase
     {
