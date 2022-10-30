@@ -30,12 +30,18 @@
     // Убрать дубли
     query = query.Distinct(new RRecordComparer());
     if (!extended) { query = query.OrderBy(r => RDFEngine.Infobase.GetName(r)); }
+    bool nothing = true;
     foreach (RRecord rec in query)
     {
+        nothing = false;
         <div>
             <a href="javascript:void(0)" @onclick="@(e =>SearchResultClick(rec))">@RDFEngine.Infobase.GetName(rec)</a>
             <span style="color:red;">@(RDFEngine.Infobase.rontology.LabelOfOnto(rec.Tp))</span>
         </div>
+    }
+    if (nothing)
+    {
+        <div>Ничего не найдено</div>
     }
     if (toedit && !string.IsNullOrEmpty(searchtype))
     {
