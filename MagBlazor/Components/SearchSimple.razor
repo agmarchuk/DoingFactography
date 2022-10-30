@@ -1,0 +1,31 @@
+﻿@using RDFEngine
+@inject OAData.IFactographDataService db
+
+<div>
+    <input @bind="searchsample" style="height:24px; margin-top:0px;margin-bottom:10px;" />
+    <select @bind="searchtype" style="height:24px; margin-top:0px;margin-bottom:10px;">
+        <option value=""></option>
+        @foreach (var typ in typs.Where(t => RDFEngine.Infobase.rontology.LabelOfOnto(t) != null)) //TODO: Надо бы более корректно...
+        {
+            <option value="@typ">@(RDFEngine.Infobase.rontology.LabelOfOnto(typ))</option>
+        }
+    </select>
+    <span>расш.<input type="checkbox" @bind="extended" /></span>
+</div>
+
+@code{
+    [Parameter]
+    public string searchsample { get; set; }
+    [Parameter]
+    public string[] typs { get; set; }
+    [Parameter]
+    public string user { get; set; }
+    private bool toedit { get { return !string.IsNullOrEmpty(user); } }
+    private bool extended = false;
+
+    private string searchtype;
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+}

@@ -24,103 +24,107 @@
         <MagBlazor.Components.Upload user="@user" onFinish="(str) => Build(entityId)" />
     *@
 </div>
-<MagBlazor.Components.Search onSelected="(rid) => UtilizeRecord((string)rid)" searchsample="@searchsample" typs="@tps" user="@user" />
-    @if (focusRec != null)
+@*<MagBlazor.Components.Search onSelected="(rid) => UtilizeRecord((string)rid)" searchsample="@searchsample" typs="@tps" user="@user" />*@
+
+<MagBlazor.Components.ViewSearch onSelected="@((rid) => UtilizeRecord((string)rid))" searchsample="@searchsample" typs="@tps" target="edit" />
+
+
+@if (focusRec != null)
+{
+    // ========    Это вставка полоски пред. след. к документу =========
+    @if (externalId != null)
     {
-        // ========    Это вставка полоски пред. след. к документу =========
-        @if (externalId != null)
-        {
-            string pr = "edit/" + prev + "/" + externalId;
-            string d = "edit/" + externalId;
-            string nx = "edit/" + next + "/" + externalId;
-            <div style="text-align: center;">
-                <NavLink href="@d">к документу</NavLink>
-                &nbsp;
-                @if (prev == null)
-                {
-                    <span>пред.</span>
-                }
-                else
-                {
-                    <NavLink href="@pr"><span>пред.</span></NavLink>
-                }
-                &nbsp;
-                @if (next == null)
-                {
-                    <span>след.</span>
-                }
-                else
-                {
-                    <NavLink href="@nx"><span>след.</span></NavLink>
-                }
-            </div>
-        }
-
-        string uri = ((RField)focusRec.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri"))?.Value;
-        if (focusRec.Tp == "http://fogid.net/o/photo-doc")
-        {
-            string sr = "docs/GetImage?u=" + uri + "&s=normal";
-            <img src="@sr" />
-
-        }
-        else if (focusRec.Tp == "http://fogid.net/o/video-doc")
-        {
-            string sr = "docs/GetVideo?u=" + uri + "&s=normal";
-            <video width="480" controls>
-                <source type="video/webm" src='@(sr + "&ext=webm")' />
-                <source type="video/mp4" src='@(sr + "&ext=mp4")' />
-                Your browser does not support the video tag.
-            </video>
-
-        }
-        else if (focusRec.Tp == "http://fogid.net/o/document")
-        {
-            string docmetainfo = ((RField)focusRec.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/docmetainfo"))?.Value;
-            if (docmetainfo != null)
+        string pr = "edit/" + prev + "/" + externalId;
+        string d = "edit/" + externalId;
+        string nx = "edit/" + next + "/" + externalId;
+        <div style="text-align: center;">
+            <NavLink href="@d">к документу</NavLink>
+            &nbsp;
+            @if (prev == null)
             {
-                string sr = "docs/GetPdf?u=" + uri;
-                <embed src="@sr" width="100%" height="800" />
+                <span>пред.</span>
             }
-
-        }
-
-        try
-        {
-
-            <MagBlazor.Components.DrawTable focusId="@focusRec.Id" inverseTp="@focusRec.Tp" records="@(new RRecord[] { focusRec })" onGo="(id) => Build((string)id)" user="@user" />
-            var list2 = RDFEngine.Infobase.rontology.AncestorsAndSelf(focusRec.Tp).SelectMany(t => RDFEngine.Infobase.rontology.GetInversePropsByType(t)).Distinct();
-            foreach (var propName in list2)
+            else
             {
-                var pr = focusInversePropTypes.FirstOrDefault(ipt => ipt.Prop == propName);
-                foreach (var typ in RDFEngine.Infobase.rontology.DomainsOfProp(propName))
-                {
-                    var it = pr == null ? null : pr.lists.FirstOrDefault(x => x.Tp == typ);
-                    if (it == null)
-                    {
-                        if (toedit)
-                        {
-                            <span>@(RDFEngine.Infobase.rontology.InvLabelOfOnto(propName)) &nbsp;</span>
-                            <span>
-                                <a href="javascript:void(0)" @onclick="@(e => BuildInverseTable(propName, typ))">@(RDFEngine.Infobase.rontology.LabelOfOnto(typ))</a> |
-                            </span>
-                        }
-                    }
-                    else
-                    {
-                        <table border="1">
-                            <tr valign="top">
-                                <td>@(RDFEngine.Infobase.rontology.InvLabelOfOnto(propName))</td>
-                                <td>
-                                    <MagBlazor.Components.DrawTable focusId="@focusRec.Id" inverseProp="@propName" inverseTp="@typ" records="@(it==null?null:it.list)" onGo="(id) => Build((string)id)" user="@user" />
-                                </td>
-                            </tr>
-                        </table>
-                    }
-                }
+                <NavLink href="@pr"><span>пред.</span></NavLink>
             }
-        }
-        catch (Exception ex) { look = ex.Message; }
+            &nbsp;
+            @if (next == null)
+            {
+                <span>след.</span>
+            }
+            else
+            {
+                <NavLink href="@nx"><span>след.</span></NavLink>
+            }
+        </div>
     }
+
+    string uri = ((RField)focusRec.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/uri"))?.Value;
+    if (focusRec.Tp == "http://fogid.net/o/photo-doc")
+    {
+        string sr = "docs/GetImage?u=" + uri + "&s=normal";
+        <img src="@sr" />
+
+    }
+    else if (focusRec.Tp == "http://fogid.net/o/video-doc")
+    {
+        string sr = "docs/GetVideo?u=" + uri + "&s=normal";
+        <video width="480" controls>
+            <source type="video/webm" src='@(sr + "&ext=webm")' />
+            <source type="video/mp4" src='@(sr + "&ext=mp4")' />
+            Your browser does not support the video tag.
+        </video>
+
+    }
+    else if (focusRec.Tp == "http://fogid.net/o/document")
+    {
+        string docmetainfo = ((RField)focusRec.Props.FirstOrDefault(p => p.Prop == "http://fogid.net/o/docmetainfo"))?.Value;
+        if (docmetainfo != null)
+        {
+            string sr = "docs/GetPdf?u=" + uri;
+            <embed src="@sr" width="100%" height="800" />
+        }
+
+    }
+
+    try
+    {
+
+        <MagBlazor.Components.DrawTable focusId="@focusRec.Id" inverseTp="@focusRec.Tp" records="@(new RRecord[] { focusRec })" onGo="(id) => Build((string)id)" user="@user" />
+        var list2 = RDFEngine.Infobase.rontology.AncestorsAndSelf(focusRec.Tp).SelectMany(t => RDFEngine.Infobase.rontology.GetInversePropsByType(t)).Distinct();
+        foreach (var propName in list2)
+        {
+            var pr = focusInversePropTypes.FirstOrDefault(ipt => ipt.Prop == propName);
+            foreach (var typ in RDFEngine.Infobase.rontology.DomainsOfProp(propName))
+            {
+                var it = pr == null ? null : pr.lists.FirstOrDefault(x => x.Tp == typ);
+                if (it == null)
+                {
+                    if (toedit)
+                    {
+                        <span>@(RDFEngine.Infobase.rontology.InvLabelOfOnto(propName)) &nbsp;</span>
+                        <span>
+                            <a href="javascript:void(0)" @onclick="@(e => BuildInverseTable(propName, typ))">@(RDFEngine.Infobase.rontology.LabelOfOnto(typ))</a> |
+                        </span>
+                    }
+                }
+                else
+                {
+                    <table border="1">
+                        <tr valign="top">
+                            <td>@(RDFEngine.Infobase.rontology.InvLabelOfOnto(propName))</td>
+                            <td>
+                                <MagBlazor.Components.DrawTable focusId="@focusRec.Id" inverseProp="@propName" inverseTp="@typ" records="@(it==null?null:it.list)" onGo="(id) => Build((string)id)" user="@user" />
+                            </td>
+                        </tr>
+                    </table>
+                }
+            }
+        }
+    }
+    catch (Exception ex) { look = ex.Message; }
+}
 
 @code{
     [Parameter] // Фокусная запись
@@ -170,7 +174,7 @@
     private void Build(string recId)
     {
         prev = null; next = null; externalId = null;
-        RRecord erec = (new RDFEngine.RYEngine(db) { User = user }).BuildPortrait(recId); 
+        RRecord erec = (new RDFEngine.RYEngine(db) { User = user }).BuildPortrait(recId);
         if (erec == null)
         {
             focusRec = null;

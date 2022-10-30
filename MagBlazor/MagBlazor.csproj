@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Components\SearchSimple.razor" />
     <Content Remove="Components\ViewPortrait2.razor" />
     <Content Remove="Components\ViewPortraitOrgsys.razor" />
     <Content Remove="Components\ViewPortraitPerson.razor" />
@@ -41,10 +42,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\SearchSimple.razor" />
     <_ContentIncludedByDefault Remove="Components\ViewPortraitOrgsys.razor" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Components\SearchSimple.razor" />
     <None Include="Views\Home\About.cshtml" />
     <None Include="Views\Home\Contacts.cshtml" />
     <None Include="Views\Home\ExtSearch.cshtml" />
@@ -60,6 +63,10 @@
     <None Include="Views\Home\Search.cshtml" />
     <None Include="Views\Shared\_Layout.cshtml" />
     <None Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\SearchSimple.razor" />
   </ItemGroup>
 
 </Project>
