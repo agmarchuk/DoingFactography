@@ -468,6 +468,7 @@
     <domain rdf:resource="http://fogid.net/o/location"/>
     <range rdf:resource="http://fogid.net/o/geosys"/>
   </ObjectProperty>
+
   <!-- Возможно, котегорию надо сделать преречислимым и указать, в частности такие места, как место рождения, место смерти, место захоронения   -->
   <DatatypeProperty rdf:about="http://fogid.net/o/location-category" priority="o">
     <label xml:lang="ru">тип размещения</label>
@@ -475,7 +476,26 @@
     <domain rdf:resource="http://fogid.net/o/location"/>
     <range rdf:resource="http://fogid.net/o/text"/>
   </DatatypeProperty>
-  
+  <DatatypeProperty rdf:about="http://fogid.net/o/location-classification" priority="o">
+    <label xml:lang="ru">клсф.размещ.</label>
+    <label xml:lang="en">location classifier</label>
+    <domain rdf:resource="http://fogid.net/o/location"/>
+    <range rdf:resource="http://fogid.net/o/location-classificator"/>
+  </DatatypeProperty>
+  <EnumerationType rdf:about="http://fogid.net/o/location-classificator">
+    <state value="born" xml:lang="ru">родился</state>
+    <state value="born" xml:lang="en">was born</state>
+    <state value="live" xml:lang="ru">проживание</state>
+    <state value="live" xml:lang="en">accomodation</state>
+    <state value="visit" xml:lang="ru">посещение</state>
+    <state value="visit" xml:lang="en">visit</state>
+    <state value="died" xml:lang="ru">умер</state>
+    <state value="died" xml:lang="en">died</state>
+    <state value="buried" xml:lang="ru">похоронен</state>
+    <state value="buried" xml:lang="en">buried</state>
+  </EnumerationType>
+
+
   <!-- Сомнительные сущности -->
   <Class rdf:about="http://fogid.net/o/post-address">
     <label xml:lang="ru">Почтовый адрес</label>

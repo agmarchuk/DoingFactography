@@ -167,7 +167,7 @@ namespace RDFEngine
             int ind = rontology.PropPosition(Tp, propId, false);
             if (ind == -1) return null;
             var prop = props[ind];
-            if (prop.PropId != propId) throw new Exception("Err: 28379");
+            if (prop == null || prop.PropId != propId) return null;
             return ((TDirect)prop).Record;
         }
         public IEnumerable<TRecord> GetMultiInverse(string propId)
