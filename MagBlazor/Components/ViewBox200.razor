@@ -1,5 +1,6 @@
-﻿@using RDFEngine;
-@inject OAData.IFactographDataService db;
+﻿@using MagBlazor.Data
+@using RDFEngine;
+@inject MagBlazor.Data.IFDataService db;
 
 <div style="width:@(width)px; height:@(height)px; border:solid thin; border-color:black;">
     <div style="font-size: small; height: 18px;">@prolog</div>
@@ -7,10 +8,22 @@
         <a href="look/@recId" style="speak:normal;">@name</a>
         <span style="font-size: small;">@dt</span>
     </div>
-    @if (uri != null)
+    @if (uri != null && documenttype != null && documenttype.StartsWith("image/"))
     {
         string src = "docs/GetImage?s=small&u=" + uri;
-        <img src="@src" style=" text-align:center;"/>
+        <img src="@src" style=" text-align:center;" />
+    }
+    else if (uri != null && documenttype != null && documenttype.StartsWith("video/"))
+    {
+        <img src="/images/video_m.jpg" style=" " />
+    }
+    else if (uri != null && documenttype != null && documenttype.StartsWith("audio/"))
+    {
+        <img src="/images/audio_m.jpg" style=" " />
+    }
+    else if (uri != null && documenttype != null && documenttype == "application/pdf")
+    {
+        <img src="/images/pdf_m.jpg" style=" " />
     }
 </div>
 
@@ -30,11 +43,12 @@
     private string dt;
     private string name;
     private string uri;
+    private string documenttype;
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        trec = new TRecord(recId, RDFEngine.Infobase.rontology, db);
+        trec = new TRecord(recId, db);
         tp = trec.Tp;
         dt = trec.GetDates();
         name = trec.GetName()?.Text;
@@ -53,10 +67,27 @@
             uri = reflectedfoto
                 ?.GetDirect("http://fogid.net/o/in-doc")
                 ?.GetText("http://fogid.net/o/uri")?.Text;
+            if (uri != null)
+            {
+                if (reflectedfoto?.GetDirect("http://fogid.net/o/in-doc").Tp ==
+                    "http://fogid.net/o/photo-doc") documenttype = "image/jpeg";
+            }
         }
         else
         {
             uri = trec.GetText("http://fogid.net/o/uri")?.Text;
+            if (uri != null)
+            {
+                documenttype = trec.GetText("http://fogid.net/o/docmetainfo")?.Text
+                   .Split(';')
+                   .Select<string, Tuple<string, string>>(part =>
+                   {
+                       int pos = part.IndexOf(':');
+                       if (pos == -1) return null;
+                       return new Tuple<string, string>(part.Substring(0, pos).Trim(), part.Substring(pos + 1).Trim());
+                   })
+                   .FirstOrDefault(t => t != null && t.Item1 == "documenttype")?.Item2;
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
-﻿@using RDFEngine;
-@inject OAData.IFactographDataService db;
+﻿@using RDFEngine
+@using MagBlazor.Data
+@inject MagBlazor.Data.IFDataService db;
 
 @{
     string sep = "";
@@ -35,12 +36,13 @@
 
     protected override void OnParametersSet()
     {
-        rtree = new RRecordTree(record.Id, RDFEngine.Infobase.rontology, new RYEngine(db));
+        rtree = new RRecordTree(record.Id, db.ontology, new RYEngine(db));
 
         name = rtree.GetName();
         dates = rtree.GetDates();
         reflections = rtree.GetMultiInverse("http://fogid.net/o/reflected");
-        portrait = reflections.FirstOrDefault(re => re.GetField("http://fogid.net/o/ground") == "portrait");
+        portrait = reflections.FirstOrDefault(re => 
+            re.GetField("http://fogid.net/o/ground") == "official" && re.GetDirect("http://fogid.net/o/in-doc")?.Tp == "http://fogid.net/o/photo-doc");
         if (portrait != null) uri = portrait.GetDirect("http://fogid.net/o/in-doc")?.GetField("http://fogid.net/o/uri");
         titles = rtree.GetMultiInverse("http://fogid.net/o/has-title");
         titles = titles.Where(ti => ti.GetDirect("http://fogid.net/o/support-org") != null).ToArray();

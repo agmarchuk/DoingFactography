@@ -29,7 +29,7 @@ namespace MagBlazor
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<IFactographDataService, FactographDataService>();
+            services.AddSingleton<MagBlazor.Data.IFDataService, MagBlazor.Data.FDataService>();
             //services.AddSingleton<WeatherForecastService>();
             services.AddHttpClient();
         }
@@ -54,7 +54,7 @@ namespace MagBlazor
             app.UseRouting();
 
             // Инициирование объектов Infobase
-            RDFEngine.Infobase.Init(env.ContentRootPath + "/wwwroot/");
+            //RDFEngine.Infobase.Init(env.ContentRootPath + "/wwwroot/");
 
             app.UseEndpoints(endpoints =>
             {

@@ -4,8 +4,8 @@ namespace MagBlazor.Controllers
 {
     public class DocsController : Controller
     {
-        private readonly OAData.IFactographDataService db;
-        public DocsController(OAData.IFactographDataService db) { this.db = db; }
+        private readonly MagBlazor.Data.IFDataService db;
+        public DocsController(MagBlazor.Data.IFDataService db) { this.db = db; }
 
         [HttpGet("docs/GetImage")]
         public IActionResult GetImage(string u, string s)

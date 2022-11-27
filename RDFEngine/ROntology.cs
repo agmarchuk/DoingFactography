@@ -239,7 +239,7 @@ namespace RDFEngine
         // Таблица перечислимых DatatypeProperty id -> XElement EnumerationType
         public Dictionary<string, XElement> enufildspecs;
         public bool IsEnumeration(string prop) => enufildspecs.ContainsKey(prop);
-        public string EnumValue(string prop, string val, string lang) // Корректно работает только с проверенными на IsEnumeration
+        public string EnumValue(string prop, string val, string lang)
         {
             if (!enufildspecs.ContainsKey(prop)) return null;
             XElement spec = enufildspecs[prop];

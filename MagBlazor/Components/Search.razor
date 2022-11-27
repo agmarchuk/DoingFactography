@@ -1,13 +1,14 @@
 ﻿@using RDFEngine
-@inject OAData.IFactographDataService db
+@using MagBlazor.Data
+@inject IFDataService db
 
 <div>
     <input @bind="searchsample" style="height:24px; margin-top:0px;margin-bottom:10px;" />
     <select @bind="searchtype" style="height:24px; margin-top:0px;margin-bottom:10px;">
         <option value=""></option>
-        @foreach (var typ in typs.Where(t => RDFEngine.Infobase.rontology.LabelOfOnto(t) != null)) //TODO: Надо бы более корректно...
+        @foreach (var typ in typs.Where(t => db.ontology.LabelOfOnto(t) != null)) //TODO: Надо бы более корректно...
         {
-            <option value="@typ">@(RDFEngine.Infobase.rontology.LabelOfOnto(typ))</option>
+            <option value="@typ">@(db.ontology.LabelOfOnto(typ))</option>
         }
     </select>
     <span>расш.<input type="checkbox" @bind="extended" /></span>
@@ -17,11 +18,11 @@
     IEnumerable<RRecord> query = null;
     if (!extended)
     {
-        query = (new RDFEngine.RYEngine(db) { User = user }).RSearch(searchsample);
+        query = (new RYEngine(db) { User = user }).RSearch(searchsample);
     }
     else
     {
-        query = (new RDFEngine.RYEngine(db) { User = user }).RSearchByWords(searchsample);
+        query = (new RYEngine(db) { User = user }).RSearchByWords(searchsample);
     }
 
 
@@ -29,14 +30,14 @@
     else query = query.Where(r => r.Tp == searchtype);
     // Убрать дубли
     query = query.Distinct(new RRecordComparer());
-    if (!extended) { query = query.OrderBy(r => RDFEngine.Infobase.GetName(r)); }
+    if (!extended) { query = query.OrderBy(r => r.GetName()); }
     bool nothing = true;
     foreach (RRecord rec in query)
     {
         nothing = false;
         <div>
-            <a href="javascript:void(0)" @onclick="@(e =>SearchResultClick(rec))">@RDFEngine.Infobase.GetName(rec)</a>
-            <span style="color:red;">@(RDFEngine.Infobase.rontology.LabelOfOnto(rec.Tp))</span>
+            <a href="javascript:void(0)" @onclick="@(e =>SearchResultClick(rec))">@rec.GetName()</a>
+            <span style="color:red;">@(db.ontology.LabelOfOnto(rec.Tp))</span>
         </div>
     }
     if (nothing)
@@ -69,7 +70,7 @@
     }
     private async Task NewItemClick(string tp)
     {
-        string nid = (new RDFEngine.RYEngine(db) { User = user }).NewRecord(searchtype, searchsample);
+        string nid = (new RYEngine(db) { User = user }).NewRecord(searchtype, searchsample);
         searchsample = null;
         await onSelected.InvokeAsync(nid);
     }

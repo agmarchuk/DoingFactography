@@ -1,7 +1,8 @@
 ﻿@page "/view/{entityId?}/{eid?}"
 @using RDFEngine;
+@using MagBlazor.Data
 @inject NavigationManager NavManager
-@inject OAData.IFactographDataService db
+@inject IFDataService db
 
 @{
     string lnk = "edit/" + entityId;
@@ -43,7 +44,7 @@
     }
     private void Build(string id)
     {
-        RRecord record = (new RDFEngine.RYEngine(db) { User = user }).GetRRecord(id);
+        RRecord record = (new RYEngine(db) { User = user }).GetRRecord(id);
         focusrecord = record;
     }
     protected override void OnInitialized() // = On Page Load

@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RDFEngine;
 
-
-namespace RDFEngine
+namespace MagBlazor.Data
 {
     public class RRecordTree
     {
         private RRecord record = null;
+        private IOntology rontology;
         private RYEngine engine;
-        public RRecordTree(string recId, ROntology rontology, RYEngine engine)
+        public RRecordTree(string recId, IOntology rontology, RYEngine engine)
         {
             this.rontology = rontology;
             this.engine = engine;
@@ -47,7 +48,6 @@ namespace RDFEngine
             return record.GetMultiInverse(ind);
         }
 
-        private ROntology rontology;
         private RRecord Do(string recId, int level, string forbidden)
         {
             // Если level = 0 - только поля, 1 - поля и прямые ссылки,  2 - поля, прямые ссылки и обратные ссылки

@@ -28,7 +28,7 @@ namespace RDFEngine
             //if (xel != null) Console.WriteLine(xel.ToString());
             //Infobase.engine = new RDFEngine.RXEngine(); // Это новый движок!!!
 
-            Infobase.rontology = new RDFEngine.ROntology(path + "ontology_iis-v13.xml");
+            rontology = new RDFEngine.ROntology(path + "ontology_iis-v13.xml");
 
             //var trec = new TRecord("famwf1233_1021", rontology);
         }

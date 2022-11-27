@@ -6,9 +6,10 @@
 @using Microsoft.Extensions.Logging
 
 @using RDFEngine
+@using MagBlazor.Data
 
 @inject IWebHostEnvironment Environment
-@inject OAData.IFactographDataService db
+@inject MagBlazor.Data.IFDataService db
 
 @if (ActiveCassette(user) != null)
 {
@@ -172,7 +173,7 @@
             }
 
             // Порождаем движок
-            RDFEngine.IEngine engine = new RDFEngine.RYEngine(db) { User = user };
+            IEngine engine = new RYEngine(db) { User = user };
 
             // Конструируем документ и добавляем его в базу данных
             string doc_id = engine.NewRecord(tp, "noname");

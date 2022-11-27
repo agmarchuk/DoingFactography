@@ -1,8 +1,9 @@
 ﻿@page "/gene/{entityId?}"
 @using RDFEngine;
 @using MagBlazor.Models
+@using MagBlazor.Data
 @inject NavigationManager NavManager
-@inject OAData.IFactographDataService db
+@inject MagBlazor.Data.IFDataService db
 
 <div>
     <input @bind="searchsample" style="height:24px; margin-top:0px;margin-bottom:10px;" />
@@ -18,23 +19,23 @@
     IEnumerable<RRecord> query = null;
     if (!extended)
     {
-        query = (new RDFEngine.RYEngine(db)).RSearch(searchsample);
+        query = (new RYEngine(db)).RSearch(searchsample);
     }
     else
     {
-        query = (new RDFEngine.RYEngine(db)).RSearchByWords(searchsample);
+        query = (new RYEngine(db)).RSearchByWords(searchsample);
     }
 
 
     query = query.Where(r => r.Tp == "http://fogid.net/o/person");
     // Убрать дубли
     query = query.Distinct(new RRecordComparer());
-    if (!extended) { query = query.OrderBy(r => RDFEngine.Infobase.GetName(r)); }
+    if (!extended) { query = query.OrderBy(r => r.GetName()); }
     query = query.ToArray();
     foreach (RRecord rec in query)
     {
         <div>
-            <a href="javascript:void(0)" @onclick="@(e =>SearchResultClick(rec))">@RDFEngine.Infobase.GetName(rec)</a>
+            <a href="javascript:void(0)" @onclick="@(e =>SearchResultClick(rec))">@rec.GetName()</a>
         </div>
     }
 }
@@ -81,7 +82,7 @@
 
     private GeneTreeModel BuildMidiPortrait(string id, GeneTreeModel parent_node)
     {
-        RRecord record = (new RDFEngine.RYEngine(db)).GetRRecord(id, true);
+        RRecord record = (new RYEngine(db)).GetRRecord(id, true);
         if (record == null) return null;
         if (record.Tp != "http://fogid.net/o/person") throw new Exception("Err: 2229 Tp=" + record.Tp);
         List<RRecord> spouse = new List<RRecord>();
@@ -92,13 +93,13 @@
                 RInverseLink ril = (RInverseLink)p;
                 if (ril.Prop == "http://fogid.net/o/husband")
                 {
-                    RRecord family = (new RDFEngine.RYEngine(db)).GetRRecord(ril.Source);
-                    spouse.Add((new RDFEngine.RYEngine(db)).GetRRecord(family.GetDirectResource("http://fogid.net/o/wife")));
+                    RRecord family = (new RYEngine(db)).GetRRecord(ril.Source);
+                    spouse.Add((new RYEngine(db)).GetRRecord(family.GetDirectResource("http://fogid.net/o/wife")));
                 }
                 if (ril.Prop == "http://fogid.net/o/wife")
                 {
-                    RRecord family = (new RDFEngine.RYEngine(db)).GetRRecord(ril.Source);
-                    spouse.Add((new RDFEngine.RYEngine(db)).GetRRecord(family.GetDirectResource("http://fogid.net/o/husband")));
+                    RRecord family = (new RYEngine(db)).GetRRecord(ril.Source);
+                    spouse.Add((new RYEngine(db)).GetRRecord(family.GetDirectResource("http://fogid.net/o/husband")));
                 }
 
             }
@@ -119,7 +120,7 @@
         focusrecord = gt_model.node;
         recordlevels = GeneTreeModel.Traverse(gt_model);
         // Предки
-        var rtree = new RRecordTree(recordlevels[0].node.Id, RDFEngine.Infobase.rontology, new RYEngine(db));
+        var rtree = new RRecordTree(recordlevels[0].node.Id, db.ontology, new RYEngine(db));
         fm = rtree.GetDirect("http://fogid.net/o/father");
         if (fm == null) fm = rtree.GetDirect("http://fogid.net/o/mother");
 

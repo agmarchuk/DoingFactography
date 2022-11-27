@@ -1,7 +1,7 @@
 ﻿@page "/edit/{entityId?}/{eid?}"
 @using RDFEngine
-@using MagBlazor
-@inject OAData.IFactographDataService db
+@using MagBlazor.Data
+@inject MagBlazor.Data.IFDataService dba
 
 @{
     string lnk = "view/" + entityId;
@@ -92,20 +92,20 @@
     {
 
         <MagBlazor.Components.DrawTable focusId="@focusRec.Id" inverseTp="@focusRec.Tp" records="@(new RRecord[] { focusRec })" onGo="(id) => Build((string)id)" user="@user" />
-        var list2 = RDFEngine.Infobase.rontology.AncestorsAndSelf(focusRec.Tp).SelectMany(t => RDFEngine.Infobase.rontology.GetInversePropsByType(t)).Distinct();
+        var list2 = dba.ontology.AncestorsAndSelf(focusRec.Tp).SelectMany(t => dba.ontology.GetInversePropsByType(t)).Distinct();
         foreach (var propName in list2)
         {
             var pr = focusInversePropTypes.FirstOrDefault(ipt => ipt.Prop == propName);
-            foreach (var typ in RDFEngine.Infobase.rontology.DomainsOfProp(propName))
+            foreach (var typ in dba.ontology.DomainsOfProp(propName))
             {
                 var it = pr == null ? null : pr.lists.FirstOrDefault(x => x.Tp == typ);
                 if (it == null)
                 {
                     if (toedit)
                     {
-                        <span>@(RDFEngine.Infobase.rontology.InvLabelOfOnto(propName)) &nbsp;</span>
+                        <span>@(dba.ontology.InvLabelOfOnto(propName)) &nbsp;</span>
                         <span>
-                            <a href="javascript:void(0)" @onclick="@(e => BuildInverseTable(propName, typ))">@(RDFEngine.Infobase.rontology.LabelOfOnto(typ))</a> |
+                            <a href="javascript:void(0)" @onclick="@(e => BuildInverseTable(propName, typ))">@(dba.ontology.LabelOfOnto(typ))</a> |
                         </span>
                     }
                 }
@@ -113,7 +113,7 @@
                 {
                     <table border="1">
                         <tr valign="top">
-                            <td>@(RDFEngine.Infobase.rontology.InvLabelOfOnto(propName))</td>
+                            <td>@(dba.ontology.InvLabelOfOnto(propName))</td>
                             <td>
                                 <MagBlazor.Components.DrawTable focusId="@focusRec.Id" inverseProp="@propName" inverseTp="@typ" records="@(it==null?null:it.list)" onGo="(id) => Build((string)id)" user="@user" />
                             </td>
@@ -136,7 +136,7 @@
     private string _user
     {
         get { return user; }
-        set { if (!string.IsNullOrEmpty(value) && db.HasWritabeFogForUser(value)) user = value; else user = null; }
+        set { if (!string.IsNullOrEmpty(value) && dba.HasWritabeFogForUser(value)) user = value; else user = null; }
     }
     private string user;
     private string newid;
@@ -144,8 +144,8 @@
     {
         if (entityId != null && newid != null)
         {
-            (new RYEngine(db)).Substitute(entityId, newid, _user);
-            RDFEngine.Infobase.Reload();
+            (new RYEngine(dba)).Substitute(entityId, newid, _user);
+            dba.Reload();
             entityId = newid;
             newid = null;
             Build(entityId);
@@ -155,8 +155,7 @@
     // Признак редактирования
     private bool toedit { get { return !string.IsNullOrEmpty(user); } }
 
-    private string[] tps = //new string[] { "http://fogid.net/o/person", "http://fogid.net/o/org-sys" };
-        RDFEngine.Infobase.rontology.DescendantsAndSelf("http://fogid.net/o/sys-obj").ToArray();
+    private string[] tps;
 
     private string searchsample = "";
     // Запись фокусного элемента и списки обратных свойств для него
@@ -174,7 +173,7 @@
     private void Build(string recId)
     {
         prev = null; next = null; externalId = null;
-        RRecord erec = (new RDFEngine.RYEngine(db) { User = user }).BuildPortrait(recId);
+        RRecord erec = (new RYEngine(dba) { User = user }).BuildPortrait(recId);
         if (erec == null)
         {
             focusRec = null;
@@ -191,7 +190,7 @@
             .Select(dd =>
             {
                 var qu = dd.Select(x => x.IRec)
-                    .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = RDFEngine.Infobase.rontology.ReorderFieldsDirects(rr, "ru") })
+                    .Select(rr => new RRecord { Id = rr.Id, Tp = rr.Tp, Props = dba.ontology.ReorderFieldsDirects(rr, "ru") })
                     .ToArray();
                 return new Models.InverseType
                 {
@@ -201,15 +200,15 @@
             }).ToArray()
     }).ToArray();
         focusInversePropTypes = query;
-        focusRec = new RRecord { Id = erec.Id, Tp = erec.Tp, Props = RDFEngine.Infobase.rontology.ReorderFieldsDirects(erec, "ru") };
+        focusRec = new RRecord { Id = erec.Id, Tp = erec.Tp, Props = dba.ontology.ReorderFieldsDirects(erec, "ru") };
         entityId = recId;
 
         // ======== Вычисление полоски ==========
         if (eid != null)
         {
             externalId = eid;
-            RRecord externalRec = (new RYEngine(db)).GetRRecord(externalId, true);
-            var rxobj = new RYEngine(db);
+            RRecord externalRec = (new RYEngine(dba)).GetRRecord(externalId, true);
+            var rxobj = new RYEngine(dba);
             string[] docset = new string[0];
             if (externalRec.Tp == "http://fogid.net/o/document")
                 docset = externalRec.Props
@@ -248,7 +247,7 @@
 
     private void BuildInverseTable(string prop, string typ)
     {
-        (new RDFEngine.RYEngine(db) { User = user }).NewRelation(typ, prop, focusRec.Id);
+        (new RYEngine(dba) { User = user }).NewRelation(typ, prop, focusRec.Id);
         Build(focusRec.Id);
         //look = $"run BuildInverseTable {prop} {typ}";
     }
@@ -256,15 +255,9 @@
     // Переменная для отладки-просмотра
     private string look = "";
 
-    //protected override void OnInitialized() // = On Page Load
-    //{
-    //    if (entityId != null)
-    //    {
-    //        Build(entityId);
-    //    }
-    //}
     protected override void OnParametersSet()
     {
+        if (tps == null) tps = dba.ontology.DescendantsAndSelf("http://fogid.net/o/sys-obj").ToArray();
         if (entityId != null)
         {
             Build(entityId);

@@ -4,9 +4,10 @@
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Logging
 @using RDFEngine
+@using MagBlazor.Data
 @inject ILogger<FileUpload1> Logger
 @inject IWebHostEnvironment Environment
-@inject OAData.IFactographDataService db
+@inject IFDataService db
 
 <h3>Upload Files</h3>
 

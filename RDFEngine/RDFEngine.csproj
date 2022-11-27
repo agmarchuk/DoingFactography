@@ -5,7 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="IFDataService.cs" />
     <Compile Remove="P3Model.cs" />
+    <Compile Remove="RRecordTree.cs" />
+    <Compile Remove="RYEngine.cs" />
+    <Compile Remove="TRecord.cs" />
   </ItemGroup>
 
   <ItemGroup>

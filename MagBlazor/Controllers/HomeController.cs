@@ -4,22 +4,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using MagBlazor.Data;
 using MagBlazor.OAModels;
 
 namespace MagBlazor.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly OAData.IFactographDataService db;
+        private readonly IFDataService db;
         private SpecialObjects so;
-        public HomeController(OAData.IFactographDataService db)
+        public HomeController(IFDataService db)
         {
             this.db = db;
             so = new SpecialObjects(db);
         }
         public IActionResult Index()
         {
-            return View("Index", new IndexModel(so));
+            return View("Index", new OAModels.IndexModel(so));
         }
         [HttpPost]
         public IActionResult Search()

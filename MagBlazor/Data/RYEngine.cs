@@ -1,20 +1,21 @@
-﻿using System;
+﻿using OAData;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using RDFEngine;
 
-
-namespace RDFEngine
+namespace MagBlazor.Data
 {
-    public class RYEngine : IEngine
+    public class RYEngine : RDFEngine.IEngine
     {
         public string User { get; set; }
         public bool All { get; set; }
 
-        private OAData.IFactographDataService fservice;
-        public RYEngine(OAData.IFactographDataService fservice) { this.fservice = fservice; }
+        private IFDataService fservice;
+        public RYEngine(IFDataService fservice) { this.fservice = fservice; }
 
         public void Build()
         {

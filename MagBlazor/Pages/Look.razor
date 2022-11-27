@@ -1,18 +1,19 @@
 ﻿@page "/look/{entityId?}/{eid?}"
 @using RDFEngine;
-@using MagBlazor.Components;
-@inject OAData.IFactographDataService db
+@using MagBlazor.Data;
+@inject MagBlazor.Data.IFDataService db
 
 <MagBlazor.Components.ViewSearch onSelected="@((rid) => UtilizeRecord((string)rid))" searchsample="@searchsample" typs="@tps" target="look" />
-<div style="font-size:small;">@(RDFEngine.Infobase.rontology.LabelOfOnto(trec.Tp))</div>
+@if (entityId == null || trec == null) { return; }
+<div style="font-size:small;">@(db.ontology.LabelOfOnto(trec.Tp))</div>
 <table style="">
     <tr>
         @if (reflectedfoto != null)
         {
-            string uri = reflectedfoto.GetDirect("http://fogid.net/o/in-doc")
+            string localuri = reflectedfoto.GetDirect("http://fogid.net/o/in-doc")
                     ?.GetText("http://fogid.net/o/uri").Text;
             <td>
-                <img src="docs/GetImage?s=small&u=@(uri)" />
+                <img src="docs/GetImage?s=small&u=@(localuri)" />
             </td>
         }
         <td>
@@ -34,6 +35,48 @@
         </td>
     </tr>
 </table>
+@if (db.ontology.DescendantsAndSelf("http://fogid.net/o/document").Contains(trec.Tp))
+{
+    <div>
+        @{
+            string uri = trec.GetText("http://fogid.net/o/uri")?.Text;
+        }
+        @if (!string.IsNullOrEmpty(uri) && trec.Tp == "http://fogid.net/o/photo-doc")
+        {
+            string sr = "docs/GetImage?u=" + uri + "&s=medium";
+            <img src="@sr" />
+        }
+        else if (!string.IsNullOrEmpty(uri) && trec.Tp == "http://fogid.net/o/video-doc")
+        {
+            string sr = "docs/GetVideo?u=" + uri;
+            <video src="@sr" controls />
+        }
+        else if (!string.IsNullOrEmpty(uri) && trec.Tp == "http://fogid.net/o/audio-doc")
+        {
+            string sr = "docs/GetAudio?u=" + uri;
+            <audio src="@sr" controls />
+        }
+        else if (!string.IsNullOrEmpty(uri) && trec.Tp == "http://fogid.net/o/document")
+        {
+            string documenttype = trec.GetText("http://fogid.net/o/docmetainfo")?.Text
+               .Split(';')
+               .Select<string, Tuple<string, string>>(part =>
+               {
+                   int pos = part.IndexOf(':');
+                   if (pos == -1) return null;
+                   return new Tuple<string, string>(part.Substring(0, pos).Trim(), part.Substring(pos + 1).Trim());
+               })
+               .FirstOrDefault(t => t != null && t.Item1 == "documenttype")?.Item2;
+            if (documenttype == "application/pdf")
+            {
+                string uri_coded = System.Web.HttpUtility.UrlEncode(uri);
+                string src = "Docs/GetPdf?u=" + uri_coded;
+                <embed src="@src" width="1024" height="800" />
+            }
+        }
+
+    </div>
+}
 @if (locations != null && locations.Count() > 0)
 {
     <div class="heading3">
@@ -43,7 +86,7 @@
     {
         string dt = location.GetDates();
         string lclass = location.GetText("http://fogid.net/o/location-classification")?.Text;
-        string lclasslabel = lclass == null ? null : RDFEngine.Infobase.rontology.EnumValue("http://fogid.net/o/location-classification",
+        string lclasslabel = lclass == null ? null : db.ontology.EnumValue("http://fogid.net/o/location-classification",
             lclass, "ru");
         <div class="norma">
             <span>@(dt)&nbsp;</span>
@@ -135,13 +178,76 @@
     var docs = reflections
         .Select(re => re.GetDirect("http://fogid.net/o/in-doc"))
         .OrderBy(rr => rr.GetDates());
-    <div class="heading3">
-        <h3>Отражен в</h3>
-    </div>
+    @if (docs.Count() > 0)
+    {
+        <div class="heading3">
+            <h3>Отражен в</h3>
+        </div>
+    }
     <div style="display: flex; flex-wrap: wrap;">
         @foreach (var r in docs)
         {
-            <MagBlazor.Components.ViewBox200 recId="@(r.Id)" width="154" height="154" />
+            <MagBlazor.Components.ViewBox200 recId="@(r.Id)" width="200" height="200" />
+        }
+    </div>
+}
+@if (authors != null && authors.Length > 0)
+{
+    <div class="heading3">
+        <h3>Полномочия</h3>
+    </div>
+    @foreach (var r in authors)
+    {
+        var aspec = r.GetText("http://fogid.net/o/authority-specificator")?.Text;
+        if (aspec != null)
+            aspec = db.ontology.EnumValue("http://fogid.net/o/authority-specificator", aspec, "ru");
+        var pers = r.GetDirect("http://fogid.net/o/author");//.GetName().Text;
+        <div>@(aspec): <a href="look/@(pers.Id)">@(pers.GetName().Text)</a></div>
+    }
+}
+@if (authdocs != null && authdocs.Length > 0)
+{
+    <div class="heading3">
+        <h3>Автор/получатель документов</h3>
+    </div>
+    <div style="display: flex; flex-wrap: wrap;">
+        @foreach (var authority in authdocs)
+        {
+            var doc = authority.GetDirect("http://fogid.net/o/adoc");
+            var aspec = authority.GetText("http://fogid.net/o/authority-specificator")?.Text;
+            if (aspec != null)
+                aspec = db.ontology.EnumValue("http://fogid.net/o/authority-specificator", aspec, "ru");
+            <MagBlazor.Components.ViewBox200 recId="@(doc.Id)" width="200" height="200" prolog="@(aspec)" />
+        }
+    </div>
+}
+@if (membcollections != null && membcollections.Length > 0)
+{
+    <div class="heading3">
+        <h3>В коллекциях</h3>
+    </div>
+    @foreach (var r in membcollections)
+    {
+        var item = r.GetDirect("http://fogid.net/o/in-collection");
+        <div><a href="look/@(item.Id)">@(item.GetName().Text)</a></div>
+    }
+}
+@if (membelements != null && membelements.Length > 0)
+{
+    <div class="heading3">
+        <h3>Элементы коллекции</h3>
+    </div>
+    <div style="display: flex; flex-wrap: wrap;">
+        @foreach (var memb in membelements)
+        {
+            var doc = memb.GetDirect("http://fogid.net/o/collection-item");
+            string pro = ""; 
+            if (doc.Tp == "http://fogid.net/o/document")
+            {
+                string dmi = doc.GetText("http://fogid.net/o/docmetainfo").Text;
+                if (dmi.Contains("application/fog")) { continue; }
+            }
+            <MagBlazor.Components.ViewBox200 recId="@(doc.Id)" width="200" height="200" prolog="@(pro)" />
         }
     </div>
 }
@@ -180,7 +286,11 @@
     private string description = null;
     private TRecord[] titles = null;
     private TRecord[] locations = null;
+    private TRecord[] authors = null;
+    private TRecord[] authdocs = null;
     private TRecord[] participations = null;
+    private TRecord[] membelements = null;
+    private TRecord[] membcollections = null;
 
     private void UtilizeRecord(string id)
     {
@@ -191,9 +301,13 @@
         description = null;
         titles = null;
         locations = null;
+        authors = null;
+        authdocs = null;
         participations = null;
+        membelements = null;
+        membcollections = null;
 
-        trec = new TRecord(id, RDFEngine.Infobase.rontology, db);
+        trec = new TRecord(id, db);
         name = trec.GetName()?.Text;
         othernames = trec.GetNames().Where(n => n.Text != name)
             .Select(t => t.Text)
@@ -205,6 +319,11 @@
         description = trec.GetText("http://fogid.net/o/description")?.Text;
         titles = trec.GetMultiInverse("http://fogid.net/o/has-title").ToArray();
         locations = trec.GetMultiInverse("http://fogid.net/o/something").ToArray();
+        authors = trec.GetMultiInverse("http://fogid.net/o/adoc").ToArray();
+        authors = trec.GetMultiInverse("http://fogid.net/o/adoc").ToArray();
+        authdocs = trec.GetMultiInverse("http://fogid.net/o/author").ToArray();
+        membelements = trec.GetMultiInverse("http://fogid.net/o/in-collection").ToArray();
+        membcollections = trec.GetMultiInverse("http://fogid.net/o/collection-item").ToArray();
 
         if (trec.Tp == "http://fogid.net/o/person")
         {

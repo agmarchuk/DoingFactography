@@ -1,5 +1,6 @@
 ﻿@using RDFEngine
-@inject OAData.IFactographDataService db
+@using MagBlazor.Data
+@inject IFDataService db
 
 @if (records == null || records.Length == 0)
 {
@@ -12,7 +13,7 @@ else
     <table border="1">
         <tr>
             <td colspan="@(rowlength)">
-                <span style="color:red;">@(RDFEngine.Infobase.rontology.LabelOfOnto(inverseTp))</span>
+                <span style="color:red;">@(db.ontology.LabelOfOnto(inverseTp))</span>
                 @if (inverseProp == null)
                 {
                     <span>&nbsp; @focusId</span>
@@ -26,7 +27,7 @@ else
         <tr valign="top" style="background-color:lightgray; font-size:smaller; font-weight: bold;">
             @foreach (var c in defrow.Props.Where(p => Allowed(p.Prop, inverseProp)))
             {
-                <td>@(RDFEngine.Infobase.rontology.LabelOfOnto(c.Prop))</td>
+                <td>@(db.ontology.LabelOfOnto(c.Prop))</td>
             }
             @if (toedit)
             {
@@ -44,14 +45,14 @@ else
                             @foreach (var c in erecord.Props.Where(p => Allowed(p.Prop, inverseProp)))
                             {
                                 <tr>
-                                    <td>@(RDFEngine.Infobase.rontology.LabelOfOnto(c.Prop))</td>
+                                    <td>@(db.ontology.LabelOfOnto(c.Prop))</td>
                                     @if (c is RField)
                                     {
                                         RField f = (RField)c;
                                         // ~~~~~~~~~~~~ выделяем вариант перечислимого и создаем под него элемент ~~~~~~
-                                        if (RDFEngine.Infobase.rontology.IsEnumeration(c.Prop))
+                                        if (db.ontology.IsEnumeration(c.Prop))
                                         {
-                                            var states = RDFEngine.Infobase.rontology.EnumPairs(c.Prop, "ru");
+                                            var states = db.ontology.EnumPairs(c.Prop, "ru");
                                             <td>
                                                 <select @onchange="@(e => SelectChangeHandler(e.Value, c))">
                                                     <option value=""></option>
@@ -83,7 +84,7 @@ else
                                         if (rr != null)
                                         {
                                             <td>
-                                                <a href="javascript:void(0)" @onclick="@(e =>LinkClick(rr.Id))">@(RDFEngine.Infobase.GetName(rr))</a>
+                                                <a href="javascript:void(0)" @onclick="@(e =>LinkClick(rr.Id))">@(rr.GetName())</a>
                                                 &nbsp;
                                                 <a href="javascript:void(0)" @onclick="@(e => DeleteLink(c.Prop))">x</a>
                                             </td>
@@ -92,8 +93,8 @@ else
                                         {
                                             if (searchlinkprop == c.Prop)
                                             {
-                                                var typps = RDFEngine.Infobase.rontology.RangesOfProp(c.Prop)
-                                                    .SelectMany(t => RDFEngine.Infobase.rontology.DescendantsAndSelf(t))
+                                                var typps = db.ontology.RangesOfProp(c.Prop)
+                                                    .SelectMany(t => db.ontology.DescendantsAndSelf(t))
                                                     .Distinct();
                                                 <td style="background-color: antiquewhite;">
                                                     <MagBlazor.Components.Search onSelected="(rid) => LinkRecord((string)rid)"
@@ -123,17 +124,17 @@ else
                 else
                 { // Обычный ряд значений
                   // переменная означает, что данная запись а) обратное отношение; б) системного типа
-                    bool isinversesysobj = inverseProp != null &&
-                        ROntology.parentsDictionary[r.Tp].Contains("http://fogid.net/o/sys-obj");
+                    var dic = db.ontology.ParentsDictionary[r.Tp];
+                    bool isinversesysobj = inverseProp != null && dic.Contains("http://fogid.net/o/sys-obj");
                     @foreach (var c in r.Props.Where(p => Allowed(p.Prop, inverseProp)))
                     {
                         if (c is RField)
                         {
                             string val = ((RField)c).Value;
                             <!-- ~~~~~~~~~~~ Вариант перечислимого  ~~~~~~~~~~~-->
-                            if (!string.IsNullOrEmpty(val) && RDFEngine.Infobase.rontology.IsEnumeration(c.Prop))
+                            if (!string.IsNullOrEmpty(val) && db.ontology.IsEnumeration(c.Prop))
                             {
-                                val = RDFEngine.Infobase.rontology.EnumValue(c.Prop, val, "ru");
+                                val = db.ontology.EnumValue(c.Prop, val, "ru");
                             }
                             if (isinversesysobj && c.Prop == "http://fogid.net/o/name")
                             {
@@ -169,7 +170,7 @@ else
                     }
                     else
                     {
-                        @(RDFEngine.Infobase.GetName(rr))
+                        @(rr.GetName())
                     }
                 </a>
             </td>
@@ -234,13 +235,13 @@ else
     private async Task NewRelItem(string prop, string tp)
     {
         if (erecord != null) return;
-        string nid = (new RDFEngine.RYEngine(db) { User = user }).NewRelation(tp, prop, focusId);
+        string nid = (new RYEngine(db) { User = user }).NewRelation(tp, prop, focusId);
         await onGo.InvokeAsync(focusId);
     }
     private async Task DelClick(string id)
     {
         if (erecord != null) return;
-        (new RDFEngine.RYEngine(db) { User = user }).DeleteRecord(id);
+        (new RYEngine(db) { User = user }).DeleteRecord(id);
         await onGo.InvokeAsync(focusId);
     }
 
@@ -274,7 +275,7 @@ else
     private void SearchLink(string prop) { searchlinkprop = prop; }
     private void LinkRecord(string rid)
     {
-        RRecord extRec = (new RDFEngine.RYEngine(db) { User = user }).GetRRecord(rid, false);
+        RRecord extRec = (new RYEngine(db) { User = user }).GetRRecord(rid, false);
         var erec = new RRecord
         {
             Id = erecord.Id,
@@ -319,7 +320,7 @@ else
         //RRecord erec = new RRecord() { Id = erecord.Id, Tp = erecord.Tp, Props = erecord.Props.Select(p => p).ToArray() };
         //erecord = erec;
 
-        (new RDFEngine.RYEngine(db) { User = user }).Update(erecord);
+        (new RYEngine(db) { User = user }).Update(erecord);
 
         // Замещение записи на новую
         for (int i = 0; i < records.Length; i++)

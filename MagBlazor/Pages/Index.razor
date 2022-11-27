@@ -1,8 +1,8 @@
 ﻿@page "/"
-@inject OAData.IFactographDataService db
+@inject MagBlazor.Data.IFDataService db
 
 <div style="font-size:large;">
-    <NavLink href="look/famwf1233_1001">look Марчук Г.И.</NavLink> |
+    <NavLink href="look/famwf1234_1120">Текущий</NavLink> |
     <NavLink href="gene/famwf1233_1001">gene Марчук Г.И.</NavLink> |
     <NavLink href="gene">Родословная</NavLink> |
     <NavLink href="view/cassetterootcollection">Кассеты с документами</NavLink> |
@@ -29,7 +29,7 @@
     protected override void OnInitialized()
     {
         //var db = fservice;
-        loook = ((OAData.FactographDataService)db).look;
+        //loook = ((OAData.IFDataService)db).look;
     }
     protected override void OnParametersSet()
     {

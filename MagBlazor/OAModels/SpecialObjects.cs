@@ -14,9 +14,9 @@ namespace MagBlazor.OAModels
             get { return _funds; } 
         }
         //public IComparer<string> comparedates { get { throw new Exception("Err: comparedates does not implemented"); } }
-        private OAData.IFactographDataService db;
+        private Data.IFDataService db;
         //private SpecialObjects so;
-        public SpecialObjects (OAData.IFactographDataService db)
+        public SpecialObjects (Data.IFDataService db)
         {
             this.db = db;
 

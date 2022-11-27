@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RDFEngine;
 
-namespace RDFEngine
+namespace MagBlazor.Data
 {
 
     /// <summary>
@@ -15,18 +16,20 @@ namespace RDFEngine
     /// </summary>
     public class TRecord
     {
-        private ROntology rontology;
-        public TRecord(string recId, ROntology rontology, OAData.IFactographDataService db, int level = 2, string forbidden = null)
+        private IFDataService db;
+        //private ROntology rontology;
+        public TRecord(string recId, IFDataService db, int level = 2, string forbidden = null)
         {
-            this.rontology = rontology;
+            this.db = db;
+            //this.rontology = rontology;
             // Если level = 0 - только поля, 1 - поля и прямые ссылки,  2 - поля, прямые ссылки и обратные ссылки
-            RRecord erec = (new RDFEngine.RYEngine(db)).GetRRecord(recId, level > 1);
+            RRecord erec = (new RYEngine(db)).GetRRecord(recId, level > 1);
             if (erec == null) return;
             Id = recId;
             Tp = erec.Tp;
 
             // В зависимости от типа, узнаем количество прямых и обратных свойств и заводим массив t-свойств этого размера  
-            int nprops = rontology.PropsTotal(Tp);
+            int nprops = db.ontology.PropsTotal(Tp);
             // Массив списков свойств для накапливания информации
             List<RProperty>[] lists = new List<RProperty>[nprops];
 
@@ -37,7 +40,7 @@ namespace RDFEngine
             foreach (var p in erec.Props)
             {
                 if (p is RLink && p.Prop == forbidden) continue;
-                int ind = rontology.PropPosition(Tp, p.Prop, p is RInverseLink);
+                int ind = db.ontology.PropPosition(Tp, p.Prop, p is RInverseLink);
                 if (ind == -1) continue;
                 if (lists[ind] == null) lists[ind] = new List<RProperty>();
                 lists[ind].Add(p); 
@@ -69,7 +72,7 @@ namespace RDFEngine
                 {
                     // Буду фиксировать только первое значение p0
                     RLink lnk = (RLink)p0;
-                    t = new TDirect { PropId = p0.Prop, Record = new TRecord(lnk.Resource, rontology, db, level - 1, null) };
+                    t = new TDirect { PropId = p0.Prop, Record = new TRecord(lnk.Resource, db, level - 1, null) };
                 }
                 else if (level > 1 && p0 is RInverseLink)
                 {
@@ -78,7 +81,7 @@ namespace RDFEngine
                     {
                         PropId = p0.Prop,
                         Records = p_list.Cast<RInverseLink>()
-                            .Select(ri => new TRecord(ri.Source, rontology, db, level - 1, p0.Prop)).ToArray()
+                            .Select(ri => new TRecord(ri.Source, db, level - 1, p0.Prop)).ToArray()
                     };
                 }
                 props[ind] = t;
@@ -98,7 +101,7 @@ namespace RDFEngine
 
         public IEnumerable<LangText> GetTexts(string propId)
         {
-            int ind = rontology.PropPosition(Tp, propId, false);
+            int ind = db.ontology.PropPosition(Tp, propId, false);
             if (ind == -1) return new LangText[0];
             var prop = props[ind];
             if (prop == null) return new LangText[0];
@@ -161,10 +164,10 @@ namespace RDFEngine
             return (string.IsNullOrEmpty(fd) ? "" : DatePrinted(fd)) +
                 (string.IsNullOrEmpty(td) ? "" : " - " + DatePrinted(td));
         }
-        public string GetLabel(string ontoTerm) => rontology.LabelOfOnto(ontoTerm);
+        public string GetLabel(string ontoTerm) => db.ontology.LabelOfOnto(ontoTerm);
         public TRecord GetDirect(string propId)
         {
-            int ind = rontology.PropPosition(Tp, propId, false);
+            int ind = db.ontology.PropPosition(Tp, propId, false);
             if (ind == -1) return null;
             var prop = props[ind];
             if (prop == null || prop.PropId != propId) return null;
@@ -172,7 +175,7 @@ namespace RDFEngine
         }
         public IEnumerable<TRecord> GetMultiInverse(string propId)
         {
-            int ind = rontology.PropPosition(Tp, propId, true);
+            int ind = db.ontology.PropPosition(Tp, propId, true);
             if (ind == -1) return new TRecord[0];
             var prop = props[ind];
             if (prop == null) return new TRecord[0];

@@ -1,13 +1,14 @@
 ﻿@using RDFEngine
-@inject OAData.IFactographDataService db
+@using MagBlazor.Data
+@inject IFDataService db
 
 <div>
     <input @bind="searchsample" style="height:24px; margin-top:0px;margin-bottom:10px;" />
     <select @bind="searchtype" style="height:24px; margin-top:0px;margin-bottom:10px;">
         <option value=""></option>
-        @foreach (var typ in typs.Where(t => RDFEngine.Infobase.rontology.LabelOfOnto(t) != null)) //TODO: Надо бы более корректно...
+        @foreach (var typ in typs.Where(t => db.ontology.LabelOfOnto(t) != null)) //TODO: Надо бы более корректно...
         {
-            <option value="@typ">@(RDFEngine.Infobase.rontology.LabelOfOnto(typ))</option>
+            <option value="@typ">@(db.ontology.LabelOfOnto(typ))</option>
         }
     </select>
     <span>расш.<input type="checkbox" @bind="extended" /></span>
