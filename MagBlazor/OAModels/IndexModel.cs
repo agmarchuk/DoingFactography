@@ -485,7 +485,7 @@ namespace MagBlazor.OAModels
 
             if (!string.IsNullOrEmpty(eid))
             {
-                XElement doctree = OAData.OADB.GetItemById(eid, new XElement("record",
+                XElement doctree = so.GetItemById(eid, new XElement("record",
                     new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/inDocument"),
                         new XElement("record",
                             new XElement("field", new XAttribute("prop", "http://fogid.net/o/pageNumbers")),
