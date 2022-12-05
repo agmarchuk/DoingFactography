@@ -37,6 +37,10 @@
 </table>
 @if (db.ontology.DescendantsAndSelf("http://fogid.net/o/document").Contains(trec.Tp))
 {
+    if (eid != null)
+    {
+        @*<div>вернуться пред. след. </div>*@
+    }
     <div>
         @{
             string uri = trec.GetText("http://fogid.net/o/uri")?.Text;
@@ -247,7 +251,8 @@
                 string dmi = doc.GetText("http://fogid.net/o/docmetainfo").Text;
                 if (dmi.Contains("application/fog")) { continue; }
             }
-            <MagBlazor.Components.ViewBox200 recId="@(doc.Id)" width="200" height="200" prolog="@(pro)" />
+            <MagBlazor.Components.ViewBox200 recId="@(doc.Id)" width="200" height="200" prolog="@(pro)" 
+                 eid="@(entityId)" />
         }
     </div>
 }

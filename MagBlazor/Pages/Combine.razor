@@ -72,7 +72,7 @@
             .Select(rr =>
             {
                 RRecord r = (new RYEngine(db)).GetRRecord(rr.Id);
-                return new RRecord { Id = r.Id, Tp = r.Tp, Props = Infobase.rontology.ReorderFieldsDirects(r, "ru") };
+                return new RRecord { Id = r.Id, Tp = r.Tp, Props = db.ontology.ReorderFieldsDirects(r, "ru") };
             })
             .ToArray())
         .ToArray()
