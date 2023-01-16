@@ -97,6 +97,8 @@
     <state value="assotiation" xml:lang="en">association</state>
     <state value="holding" xml:lang="ru">холдинг</state>
     <state value="holding" xml:lang="en">holding</state>
+    <state value="mastersk" xml:lang="ru">мастерская</state>
+    <state value="mastersk" xml:lang="en">workshop</state>
   </EnumerationType>
   <DatatypeProperty rdf:about="http://fogid.net/o/org-category" priority="ac">
     <label xml:lang="ru">вид.орг.</label>
@@ -466,6 +468,7 @@
     <domain rdf:resource="http://fogid.net/o/location"/>
     <range rdf:resource="http://fogid.net/o/geosys"/>
   </ObjectProperty>
+
   <!-- Возможно, котегорию надо сделать преречислимым и указать, в частности такие места, как место рождения, место смерти, место захоронения   -->
   <DatatypeProperty rdf:about="http://fogid.net/o/location-category" priority="o">
     <label xml:lang="ru">тип размещения</label>
@@ -473,7 +476,26 @@
     <domain rdf:resource="http://fogid.net/o/location"/>
     <range rdf:resource="http://fogid.net/o/text"/>
   </DatatypeProperty>
-  
+  <DatatypeProperty rdf:about="http://fogid.net/o/location-classification" priority="o">
+    <label xml:lang="ru">клсф.размещ.</label>
+    <label xml:lang="en">location classifier</label>
+    <domain rdf:resource="http://fogid.net/o/location"/>
+    <range rdf:resource="http://fogid.net/o/location-classificator"/>
+  </DatatypeProperty>
+  <EnumerationType rdf:about="http://fogid.net/o/location-classificator">
+    <state value="born" xml:lang="ru">родился</state>
+    <state value="born" xml:lang="en">was born</state>
+    <state value="live" xml:lang="ru">проживание</state>
+    <state value="live" xml:lang="en">accomodation</state>
+    <state value="visit" xml:lang="ru">посещение</state>
+    <state value="visit" xml:lang="en">visit</state>
+    <state value="died" xml:lang="ru">умер</state>
+    <state value="died" xml:lang="en">died</state>
+    <state value="buried" xml:lang="ru">похоронен</state>
+    <state value="buried" xml:lang="en">buried</state>
+  </EnumerationType>
+
+
   <!-- Сомнительные сущности -->
   <Class rdf:about="http://fogid.net/o/post-address">
     <label xml:lang="ru">Почтовый адрес</label>
@@ -715,6 +737,8 @@
     <range rdf:resource="http://fogid.net/o/personage-ground"/>
   </DatatypeProperty>
   <EnumerationType rdf:about="http://fogid.net/o/personage-ground">
+    <state value="official" xml:lang="ru">официальный</state>
+    <state value="official" xml:lang="en">official</state>
     <state value="portrait" xml:lang="ru">портрет</state>
     <state value="portrait" xml:lang="en">portrait</state>
     <state value="foreground" xml:lang="ru">первый план</state>
@@ -784,12 +808,7 @@
   </ObjectProperty>
   <!--                   конец вставка онтологии ontology_iis-v7-doc                   -->
 
-  <!--                   Вставка многостранчиного документа и многостраничной иерархии  2012-06-13                   -->
-  <Class rdf:about="http://fogid.net/o/document">
-    <label xml:lang="ru">Многостраничный документ</label>
-    <label xml:lang="en">Multi part document</label>
-    <SubClassOf rdf:resource="http://fogid.net/o/document"/>
-  </Class>
+  <!--                   Вставка многостранчиного документа и многостраничной иерархии  2012-06-13, 2022-06-07                   -->
   <Class rdf:about="http://fogid.net/o/DocumentPart">
     <label xml:lang="ru">Раздел документа</label>
     <label xml:lang="en">Part of document</label>

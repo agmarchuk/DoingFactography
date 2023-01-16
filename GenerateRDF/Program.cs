@@ -41,7 +41,7 @@ namespace GenerateRDF
                         new XElement("indoc", new XAttribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource", "f" + rnd.Next(nf))))));
 
             // Проверяю что получилось
-            dataset.Save("../../../output.rdf");
+            dataset.Save(File.CreateText("../../../output.rdf"));
 
             // Поиск по образцу
             Func<XElement, string, IEnumerable<XElement>> Search = (ds, sample) => ds.Elements()
