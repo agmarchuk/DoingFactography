@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32602.291
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateRDF", "GenerateRDF\GenerateRDF.csproj", "{7EEE0A03-CA1D-4CE3-B4E4-8E30C01481D8}"
 EndProject
@@ -28,6 +28,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polar.Universal", "..\PolarDB\Polar.Universal\Polar.Universal.csproj", "{12B303AB-6E78-4478-898F-90D746E74EBA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTransformer", "ConsoleTransformer\ConsoleTransformer.csproj", "{53559253-1330-45D6-AF5B-9D8639C9A333}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FactorgaphyTTree", "FactorgaphyTTree\FactorgaphyTTree.csproj", "{719D2CC0-9999-4053-A87D-B397E8500FED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{53559253-1330-45D6-AF5B-9D8639C9A333}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53559253-1330-45D6-AF5B-9D8639C9A333}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53559253-1330-45D6-AF5B-9D8639C9A333}.Release|Any CPU.Build.0 = Release|Any CPU
+		{719D2CC0-9999-4053-A87D-B397E8500FED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{719D2CC0-9999-4053-A87D-B397E8500FED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{719D2CC0-9999-4053-A87D-B397E8500FED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{719D2CC0-9999-4053-A87D-B397E8500FED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

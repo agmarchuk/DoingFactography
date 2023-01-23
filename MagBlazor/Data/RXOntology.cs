@@ -158,6 +158,10 @@ namespace MagBlazor.Data
         {
             return dicsInversePropsForType[tp];
         }
+        public IEnumerable<string> GetDirectPropsByType(string tp)
+        {
+            return dicsDirectPropsForType[tp];
+        }
         public int PropsTotal(string tp)
         {
             int n1 = dicsDirectPropsForType[tp].Length;

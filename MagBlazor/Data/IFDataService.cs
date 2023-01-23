@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OAData.Adapters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,8 @@ namespace MagBlazor.Data
         XElement GetItemByIdBasic(string id, bool addinverse);
         XElement GetItemById(string id, XElement format);
         IEnumerable<XElement> GetAll();
+
+        DAdapter GetAdapter();
 
         // ============== Загрузка базы данных ===============
         //void StartFillDb(Action<string> turlog);

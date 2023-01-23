@@ -736,5 +736,10 @@ namespace MagBlazor.Data
             //Console.WriteLine($"ReadFogAttributes({pth}) : {owner} {prefix} {counter} ");
             return (owner, prefix, counter);
         }
+
+        public DAdapter GetAdapter()
+        {
+            return adapter;
+        }
     }
 }

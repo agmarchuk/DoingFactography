@@ -12,6 +12,7 @@ namespace MagBlazor.Data
         IEnumerable<string> DescendantsAndSelf(string id);
         int PropsTotal(string tp);
         IEnumerable<string> GetInversePropsByType(string tp);
+        IEnumerable<string> GetDirectPropsByType(string tp);
         string LabelOfOnto(string id);
         string InvLabelOfOnto(string propId);
         IEnumerable<string> DomainsOfProp(string propId);
