@@ -8,12 +8,12 @@
 <PageTitle>Viewer</PageTitle>
 
 <h1>Viewer</h1>
-<TTreeViewer ttrees="@(new TTree[]{currentRecord})"> </TTreeViewer>
+<TTreeEditor ttrees="@(new TTree[]{currentRecord})"> </TTreeEditor>
 @foreach (var inverse in inverses)
 {
     <h3>@Utils.GetOntLabel(inverse.Pred)</h3>
     var sources = ((TITree)inverse).Sources;
-    <TTreeViewer ttrees="@sources"></TTreeViewer>
+    <TTreeEditor ttrees="@sources"></TTreeEditor>
 }
 
 

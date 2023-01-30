@@ -1,0 +1,126 @@
+﻿@using FactorgaphyTTree.Pages;
+@using MagBlazor.Data;
+@using Data;
+@inject MagBlazor.Data.IFDataService db
+@inject NavigationManager navigationManager
+
+<table>
+    @for (int ttreeInd = 0; ttreeInd < ttrees.Count(); ttreeInd++)
+    {
+        var ttree = ttrees[ttreeInd];
+        var texts = ttree.Groups.Where(gr => gr is Texts).ToArray();
+        var directs = ttree.Groups.Where(gr => gr is TDTree).ToArray();
+        var possibleDirects = db.ontology.GetDirectPropsByType(ttree.Tp).ToArray();
+
+        @if (ttreeInd == 0)
+        {
+            <tr>
+                @foreach (var possibleDirect in possibleDirects)
+                {
+                    <th>@Utils.GetOntLabel(possibleDirect)</th>
+
+                }
+            </tr>
+        }
+        <tr>
+            @for (int i = 0; i < possibleDirects.Count(); i++)
+            {
+                var possibleDirect = possibleDirects[i];
+                var value = texts.FirstOrDefault(text => text.Pred == possibleDirect);
+                var ranges = db.ontology.RangesOfProp(possibleDirect);
+                var anc = db.ontology.AncestorsAndSelf(possibleDirect);
+                if (value != null)
+                {
+                    bool isEnum = db.ontology.IsEnumeration(value.Pred);
+                    if (isEnum)
+                    {
+                        var options = db.ontology.EnumPairs(value.Pred, MainLayout.defaultLanguage);
+                        if (editedRow == ttreeInd)
+                        {
+                            var currValue = ((Texts)value).Values.FirstOrDefault()?.Text;
+                            <td>
+                                <select>
+                                    <option value="null"></option>
+                                    @foreach (var option in options)
+                                    {
+                                        if (option.Key == currValue)
+                                        {
+                                            <option value="@option.Key" selected>@option.Value</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Key">@option.Value</option>
+                                        }
+                                    }
+                                </select>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>@Utils.GetLangText(value, value.Pred)</td>
+                        }
+
+                    }
+                    else
+                    {
+                        var textVal = Utils.GetLangText(value);
+                        if (editedRow == ttreeInd)
+                        {
+                            <td><input type="text" @bind-value="@textVal" /></td>
+                        } else
+                        {
+                            <td>@textVal</td>
+                        }
+                    }
+
+                }
+                else
+                {
+                    value = directs.FirstOrDefault(text => text.Pred == possibleDirect);
+                    if (value != null)
+                    {
+                        <td><NavLink href="@("/viewer/" + ((TDTree)value).Resource.Id)">@Utils.GetName(((TDTree)value).Resource)</NavLink></td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                }
+                var currentInd = ttreeInd;
+                if (i == possibleDirects.Count() - 1)
+                {
+                    if (editedRow < 0)
+                    {
+                        <td><button href="javascript:void(0)" @onclick="@(arg => {editedRow = currentInd;})">Изменить</button></td>
+                    }
+                    else
+                    {
+                        <td><button href="javascript:void(0)" @onclick="@(arg => {editedRow = -1;})">Сохранить</button></td>
+                    }
+
+                }
+            }
+        </tr>
+
+    }
+</table>
+
+
+@code {
+    [Parameter]
+    public TTree[] ttrees { get; set; }
+
+    private bool isEditor = true;
+
+    private int editedRow = -1;
+
+    protected override void OnInitialized() // = On Page Load
+    {
+        Utils.InitUtils(db);
+    }
+
+    protected override void OnParametersSet()
+    {
+        OnInitialized();
+    }
+}

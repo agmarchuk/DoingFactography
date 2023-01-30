@@ -20,4 +20,8 @@
     <ProjectReference Include="..\MagBlazor\MagBlazor.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
 </Project>

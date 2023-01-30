@@ -27,16 +27,26 @@
         @foreach (var possibleDirect in possibleDirects)
         {
             var value = texts.FirstOrDefault(text => text.Pred == possibleDirect);
+            
             if (value != null)
             {
-                <td>@Utils.GetLangText(value)</td>
+                bool isEnum = db.ontology.IsEnumeration(value.Pred);
+                if (isEnum)
+                {
+                    <td>@Utils.GetLangText(value, value.Pred)</td>
+                }
+                else
+                {
+                    <td>@Utils.GetLangText(value)</td>
+                }
+                    
             }
             else
             {
                 value = directs.FirstOrDefault(text => text.Pred == possibleDirect);
                 if (value != null)
                 {
-                        <td><NavLink href="#" @onclick="@(arg => goToEntityUrl(((TDTree)value).Resource.Id))">@Utils.GetName(((TDTree)value).Resource)</NavLink></td>
+                        <td><NavLink href="@("/viewer/" + ((TDTree)value).Resource.Id)">@Utils.GetName(((TDTree)value).Resource)</NavLink></td>
                 }
                 else
                 {
@@ -58,16 +68,12 @@
 
     protected override void OnInitialized() // = On Page Load
     {
+        firstRow = true;
         Utils.InitUtils(db);
     }
 
     protected override void OnParametersSet()
     {
         OnInitialized();
-    }
-
-    private void goToEntityUrl(string id)
-    {
-        navigationManager.NavigateTo("/viewer/" + id, true);
     }
 }
